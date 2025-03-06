@@ -150,7 +150,26 @@
     <button onclick="undo()">Undo</button>
   </div>
 
+  <!-- Firebase Integration -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
   <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCROI6H97ChhVbi0CARQ3NiQtuGP7GdSDY",
+      authDomain: "scoring-869fb.firebaseapp.com",
+      databaseURL: "https://scoring-869fb-default-rtdb.firebaseio.com",
+      projectId: "scoring-869fb",
+      storageBucket: "scoring-869fb.firebasestorage.app",
+      messagingSenderId: "360008597143",
+      appId: "1:360008597143:web:bb1e5911f726467db773d2",
+      measurementId: "G-1QFT7H1PTZ"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
     // Initialize score data
     let scoreData = {
       team1: { name: "INDIA", runs: 0, wickets: 0 },
@@ -171,9 +190,9 @@
     // Track selected extra
     let selectedExtra = null;
 
-    // Save score data to local storage
-    function saveScoreData() {
-      localStorage.setItem("scoreData", JSON.stringify(scoreData));
+    // Save score data to Firebase
+    function saveScoreData(data) {
+      database.ref("scoreData").set(data);
       updateDisplay();
     }
 
@@ -194,7 +213,7 @@
         scoreData.balls++;
         scoreData.currentOver.push(runs);
       }
-      saveScoreData();
+      saveScoreData(scoreData);
       updateExtraButtons();
     }
 
@@ -222,7 +241,7 @@
       scoreData.bowlers[scoreData.currentBowlerIndex].wickets++;
       scoreData.batters[0].isOut = true;
       scoreData.currentOver.push(`W (${mode})`);
-      saveScoreData();
+      saveScoreData(scoreData);
       addBatter(); // Add a new batter
     }
 
@@ -231,7 +250,7 @@
       const temp = scoreData.batters[0];
       scoreData.batters[0] = scoreData.batters[1];
       scoreData.batters[1] = temp;
-      saveScoreData();
+      saveScoreData(scoreData);
     }
 
     // Add a new batter
@@ -239,7 +258,7 @@
       const newBatter = { name: `Batter ${scoreData.batters.length + 1}`, runs: 0, balls: 0, isOut: false };
       scoreData.batters.push(newBatter);
       scoreData.batters.shift(); // Remove the dismissed batter
-      saveScoreData();
+      saveScoreData(scoreData);
     }
 
     // Add a new bowler
@@ -247,13 +266,13 @@
       const newBowler = { name: `Bowler ${scoreData.bowlers.length + 1}`, overs: 0, wickets: 0, runsConceded: 0 };
       scoreData.bowlers.push(newBowler);
       scoreData.currentBowlerIndex = scoreData.bowlers.length - 1;
-      saveScoreData();
+      saveScoreData(scoreData);
     }
 
     // Undo the last action
     function undo() {
       // Implement undo logic if needed
-      saveScoreData();
+      saveScoreData(scoreData);
     }
 
     // Update the display
@@ -274,25 +293,25 @@
     // Update team names
     document.getElementById("team1-name").addEventListener("input", (e) => {
       scoreData.team1.name = e.target.value;
-      saveScoreData();
+      saveScoreData(scoreData);
     });
     document.getElementById("team2-name").addEventListener("input", (e) => {
       scoreData.team2.name = e.target.value;
-      saveScoreData();
+      saveScoreData(scoreData);
     });
 
     // Update batter and bowler names
     document.getElementById("batter1-name").addEventListener("input", (e) => {
       scoreData.batters[0].name = e.target.value;
-      saveScoreData();
+      saveScoreData(scoreData);
     });
     document.getElementById("batter2-name").addEventListener("input", (e) => {
       scoreData.batters[1].name = e.target.value;
-      saveScoreData();
+      saveScoreData(scoreData);
     });
     document.getElementById("bowler-name").addEventListener("input", (e) => {
       scoreData.bowlers[scoreData.currentBowlerIndex].name = e.target.value;
-      saveScoreData();
+      saveScoreData(scoreData);
     });
 
     // Initial display update
