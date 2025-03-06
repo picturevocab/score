@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cricket Score Overlay</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ticker-overlay">
+    <div class="first-row">
+      <span class="team-name" id="team1-name">INDIA</span>
+      <span class="score" id="team1-score">0/0</span>
+      <span class="overs" id="overs">0.0 OV</span>
+      <span class="team2-score" id="team2-name">AUS 0/0</span>
+    </div>
+    <div class="second-row">
+      <div class="batters">
+        <span class="batter" id="batter1">Batter 1: <span class="runs">0</span> (<span class="balls">0</span>)</span>
+        <span class="batter" id="batter2">Batter 2: <span class="runs">0</span> (<span class="balls">0</span>)</span>
+      </div>
+      <div class="bowler">
+        <span class="bowler-name" id="bowler-name">Bowler</span>
+        <span class="bowler-stats" id="bowler-stats">0.0 (<span class="wickets">0</span>-<span class="runs-conceded">0</span>)</span>
+      </div>
+      <div class="delivery-tracker" id="delivery-tracker"></div>
+    </div>
+  </div>
+
+  <script>
+    // Function to update the overlay
+    function updateOverlay() {
+      const scoreData = JSON.parse(localStorage.getItem("scoreData")) || {
+        team1: { name: "INDIA", runs: 0, wickets: 0 },
+        team2: { name: "AUS", runs: 0, wickets: 0 },
+        overs: 0,
+        balls: 0,
+        batter1: { name: "Batter 1", runs: 0, balls: 0 },
+        batter2: { name: "Batter 2", runs: 0, balls: 0 },
+        bowler: { name: "Bowler", overs: 0, wickets: 0, runsConceded: 0 },
+        currentOver: [],
+      };
+
+      // Update team names
+      document.getElementById("team1-name").textContent = scoreData.team1.name;
+      document.getElementById("team2-name").textContent = `${scoreData.team2.name} ${scoreData.team2.runs}/${scoreData.team2.wickets}`;
+
+      // Update score
+      document.getElementById("team1-score").textContent = `${scoreData.team1.runs}/${scoreData.team1.wickets}`;
+
+      // Update overs
+      document.getElementById("overs").textContent = `${Math.floor(scoreData.balls / 6)}.${scoreData.balls % 6} OV`;
+
+      // Update batters
+      document.getElementById("batter1").innerHTML = `${scoreData.batter1.name}: <span class="runs">${scoreData.batter1.runs}</span> (<span class="balls">${scoreData.batter1.balls}</span>)`;
+      document.getElementById("batter2").innerHTML = `${scoreData.batter2.name}: <span class="runs">${scoreData.batter2.runs}</span> (<span class="balls">${scoreData.batter2.balls}</span>)`;
+
+      // Update bowler
+      document.getElementById("bowler-name").textContent = scoreData.bowler.name;
+      document.getElementById("bowler-stats").innerHTML = `${Math.floor(scoreData.balls / 6)}.${scoreData.balls % 6} (<span class="wickets">${scoreData.bowler.wickets}</span>-<span class="runs-conceded">${scoreData.bowler.runsConceded}</span>)`;
+
+      // Update delivery tracker
+      const tracker = document.getElementById("delivery-tracker");
+      tracker.innerHTML = scoreData.currentOver.map((ball) => `<div class="ball ${ball === 'W' ? 'wicket' : ''}">${ball}</div>`).join("");
+    }
+
+    // Update the overlay every second
+    setInterval(updateOverlay, 1000);
+  </script>
+</body>
+</html>
