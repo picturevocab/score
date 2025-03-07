@@ -106,6 +106,12 @@
       font-weight: bold;
       color: red;
     }
+    .end-of-over {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2196F3;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
@@ -176,6 +182,7 @@
     <div class="bowler-display">
       <strong>Bowler:</strong> <span id="bowler-display">0.0 (0-0)</span>
     </div>
+    <div class="end-of-over" id="end-of-over" style="display: none;">End of Over!</div>
     <div class="score-buttons">
       <button onclick="addRuns(0)">0</button>
       <button onclick="addRuns(1)">1</button>
@@ -290,11 +297,15 @@
         matchData.batters[matchData.batterOnStrike].balls++;
         matchData.bowlers[matchData.currentBowlerIndex].runsConceded += runs;
         matchData.currentOver.push(runs);
+        matchData.currentInnings.team1.balls++;
       }
-      matchData.currentInnings.team1.balls++;
-      if (matchData.currentInnings.team1.balls % 6 === 0) {
-        matchData.currentInnings.team1.overs++;
+
+      // Check for end of over
+      if (matchData.currentInnings.team1.balls % 6 === 0 && !matchData.selectedExtra) {
+        document.getElementById("end-of-over").style.display = "block";
+        changeBowler();
       }
+
       updateDisplay();
     }
 
@@ -343,6 +354,7 @@
       confirmButton.textContent = "Confirm";
       confirmButton.onclick = () => {
         matchData.bowlers[matchData.currentBowlerIndex].name = newBowlerSelect.value;
+        document.getElementById("end-of-over").style.display = "none";
         updateDisplay();
         document.body.removeChild(newBowlerSelect);
         document.body.removeChild(confirmButton);
