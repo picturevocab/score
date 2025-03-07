@@ -94,11 +94,11 @@
       border-radius: 5px;
       margin-bottom: 15px;
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    }
-    .batter-on-strike::before {
-      content: "→ ";
-      color: green;
       font-weight: bold;
+    }
+    .batter-on-strike {
+      font-weight: bold;
+      text-decoration: underline;
     }
     .team-score {
       font-size: 20px;
@@ -171,10 +171,11 @@
       font-weight: bold;
       color: navy; /* Navy blue for batter names */
     }
-    .batter-display span::before {
-      content: " | ";
+    .target-display {
+      font-size: 18px;
       font-weight: bold;
-      color: red; /* Red for the vertical line */
+      color: #4CAF50;
+      margin-bottom: 15px;
     }
   </style>
 </head>
@@ -230,15 +231,15 @@
 
   <!-- Screen 3: Scoring Interface -->
   <div id="scoring-interface" class="screen">
-    <h1>Scoring Interface</h1>
+    <h1 id="match-title"></h1>
     <div class="match-summary">
-      <strong>Match Summary:</strong>
-      <div>Team 1: <span id="summary-team1"></span></div>
-      <div>Team 2: <span id="summary-team2"></span></div>
-      <div>Overs: <span id="summary-overs"></span></div>
+      <span id="summary-team1"></span> <strong>VS</strong> <span id="summary-team2"></span> | Overs: <span id="summary-overs"></span>
     </div>
     <div class="score-display">
-      <strong>Team Score:</strong> <span id="team-score" class="team-score">0/0</span> | <strong>Overs:</strong> <span id="overs-display" class="overs-display">0.0</span>
+      <strong><span id="batting-team-name"></span>:</strong> <span id="team-score" class="team-score">0/0</span> | <strong>Overs:</strong> <span id="overs-display" class="overs-display">0.0</span> | <strong>Run Rate:</strong> <span id="run-rate">0.00</span>
+    </div>
+    <div class="target-display" id="target-display" style="display: none;">
+      <strong>Target:</strong> <span id="target-runs"></span> | <strong>Req. Run Rate:</strong> <span id="required-run-rate"></span>
     </div>
     <div class="batter-display">
       <span id="batter1-display">0 (0)</span>
@@ -266,7 +267,7 @@
     </div>
     <div class="action-buttons">
       <button onclick="swapBatters()">Swap Batters</button>
-      <button onclick="changeBowler()">Change Bowler</button>
+      <button onclick="showNewBowlerPopup()">Change Bowler</button>
     </div>
     <div class="input-group">
       <label for="out-type">Out Type:</label>
@@ -301,16 +302,34 @@
     <button onclick="confirmNewBowler()">Confirm</button>
   </div>
 
+  <!-- Popup for 2nd Innings -->
+  <div id="second-innings-popup" class="popup" style="display: none;">
+    <h2>Start 2nd Innings</h2>
+    <p>Team 1 has scored <span id="first-innings-score"></span> runs.</p>
+    <div class="input-group">
+      <label for="batter1-2nd">Batter 1:</label>
+      <select id="batter1-2nd"></select>
+    </div>
+    <div class="input-group">
+      <label for="batter2-2nd">Batter 2:</label>
+      <select id="batter2-2nd"></select>
+    </div>
+    <div class="input-group">
+      <label for="bowler-2nd">Bowler:</label>
+      <select id="bowler-2nd"></select>
+    </div>
+    <button onclick="startSecondInnings()">Start 2nd Innings</button>
+  </div>
+
   <script>
     // Data storage
     let matchData = {
       team1: { name: "", players: [] },
       team2: { name: "", players: [] },
       overs: 0,
-      currentInnings: {
-        team1: { runs: 0, wickets: 0, overs: 0, balls: 0 },
-        team2: { runs: 0, wickets: 0, overs: 0, balls: 0 },
-      },
+      currentInnings: 1,
+      innings1: { runs: 0, wickets: 0, overs: 0, balls: 0 },
+      innings2: { runs: 0, wickets: 0, overs: 0, balls: 0 },
       batters: [],
       bowlers: [],
       currentBowlerIndex: 0,
@@ -349,6 +368,7 @@
 
     // Initialize Scoring Interface
     function initScoringInterface() {
+      document.getElementById("match-title").textContent = `${matchData.team1.name} VS ${matchData.team2.name}`;
       document.getElementById("summary-team1").textContent = matchData.team1.name;
       document.getElementById("summary-team2").textContent = matchData.team2.name;
       document.getElementById("summary-overs").textContent = matchData.overs;
@@ -370,18 +390,20 @@
       matchData.history.push(JSON.parse(JSON.stringify(matchData)));
       if (matchData.history.length > 6) matchData.history.shift();
 
+      const currentInnings = matchData.currentInnings === 1 ? matchData.innings1 : matchData.innings2;
+
       if (matchData.selectedExtra) {
-        matchData.currentInnings.team1.runs += runs + 1;
+        currentInnings.runs += runs + 1;
         matchData.bowlers[matchData.currentBowlerIndex].runsConceded += runs + 1;
         matchData.currentOver.push(`${matchData.selectedExtra}+${runs}`);
         matchData.selectedExtra = null;
       } else {
-        matchData.currentInnings.team1.runs += runs;
+        currentInnings.runs += runs;
         matchData.batters[matchData.batterOnStrike].runs += runs;
         matchData.batters[matchData.batterOnStrike].balls++;
         matchData.bowlers[matchData.currentBowlerIndex].runsConceded += runs;
         matchData.currentOver.push(runs);
-        matchData.currentInnings.team1.balls++;
+        currentInnings.balls++;
       }
 
       // Swap batters for 1 or 3 runs
@@ -390,24 +412,69 @@
       }
 
       // Check for end of over
-      if (matchData.currentInnings.team1.balls % 6 === 0 && !matchData.selectedExtra) {
+      if (currentInnings.balls % 6 === 0 && !matchData.selectedExtra) {
         document.getElementById("end-of-over").style.display = "block";
         showNewBowlerPopup();
+      }
+
+      // Check for end of innings
+      if (currentInnings.overs >= matchData.overs && matchData.currentInnings === 1) {
+        document.getElementById("second-innings-popup").style.display = "block";
+        document.getElementById("first-innings-score").textContent = currentInnings.runs;
+        populateSecondInningsPlayers();
       }
 
       updateDisplay();
     }
 
-    // Select an extra
-    function selectExtra(extra) {
-      matchData.selectedExtra = extra;
-      updateExtraButtons();
+    // Populate players for 2nd innings
+    function populateSecondInningsPlayers() {
+      const batter1Select = document.getElementById("batter1-2nd");
+      const batter2Select = document.getElementById("batter2-2nd");
+      const bowlerSelect = document.getElementById("bowler-2nd");
+
+      batter1Select.innerHTML = matchData.team2.players.map((player) => `<option value="${player}">${player}</option>`).join("");
+      batter2Select.innerHTML = matchData.team2.players.map((player) => `<option value="${player}">${player}</option>`).join("");
+      bowlerSelect.innerHTML = matchData.team1.players.map((player) => `<option value="${player}">${player}</option>`).join("");
+    }
+
+    // Start 2nd innings
+    function startSecondInnings() {
+      matchData.currentInnings = 2;
+      document.getElementById("second-innings-popup").style.display = "none";
+      document.getElementById("target-display").style.display = "block";
+      document.getElementById("target-runs").textContent = matchData.innings1.runs + 1;
+
+      // Set batters and bowler for 2nd innings
+      matchData.batters = [
+        { name: document.getElementById("batter1-2nd").value, runs: 0, balls: 0 },
+        { name: document.getElementById("batter2-2nd").value, runs: 0, balls: 0 },
+      ];
+      matchData.bowlers = [
+        { name: document.getElementById("bowler-2nd").value, overs: 0, wickets: 0, runsConceded: 0 },
+      ];
+      updateDisplay();
     }
 
     // Update display
     function updateDisplay() {
-      document.getElementById("team-score").textContent = `${matchData.currentInnings.team1.runs}/${matchData.currentInnings.team1.wickets}`;
-      document.getElementById("overs-display").textContent = `${Math.floor(matchData.currentInnings.team1.balls / 6)}.${matchData.currentInnings.team1.balls % 6}`;
+      const currentInnings = matchData.currentInnings === 1 ? matchData.innings1 : matchData.innings2;
+      const battingTeam = matchData.currentInnings === 1 ? matchData.team1.name : matchData.team2.name;
+      const oversBowled = Math.floor(currentInnings.balls / 6) + (currentInnings.balls % 6) / 10;
+      const runRate = (currentInnings.runs / oversBowled).toFixed(2);
+
+      document.getElementById("batting-team-name").textContent = battingTeam;
+      document.getElementById("team-score").textContent = `${currentInnings.runs}/${currentInnings.wickets}`;
+      document.getElementById("overs-display").textContent = oversBowled.toFixed(1);
+      document.getElementById("run-rate").textContent = runRate;
+
+      if (matchData.currentInnings === 2) {
+        const target = matchData.innings1.runs + 1;
+        const requiredRuns = target - currentInnings.runs;
+        const remainingBalls = matchData.overs * 6 - currentInnings.balls;
+        const requiredRunRate = ((requiredRuns / remainingBalls) * 6).toFixed(2);
+        document.getElementById("required-run-rate").textContent = requiredRunRate;
+      }
 
       // Update batter display
       const batter1Display = document.getElementById("batter1-display");
@@ -415,7 +482,7 @@
       batter1Display.innerHTML = `${matchData.batters[0].name}: ${matchData.batters[0].runs} (${matchData.batters[0].balls})`;
       batter2Display.innerHTML = `${matchData.batters[1].name}: ${matchData.batters[1].runs} (${matchData.batters[1].balls})`;
 
-      // Add arrow to batter on strike
+      // Add underline and bold to batter on strike
       if (matchData.batterOnStrike === 0) {
         batter1Display.classList.add("batter-on-strike");
         batter2Display.classList.remove("batter-on-strike");
@@ -426,7 +493,7 @@
 
       // Update bowler display
       const bowler = matchData.bowlers[matchData.currentBowlerIndex];
-      document.getElementById("bowler-display").textContent = `${bowler.name}: ${Math.floor(matchData.currentInnings.team1.balls / 6)}.${matchData.currentInnings.team1.balls % 6} (${bowler.wickets}-${bowler.runsConceded})`;
+      document.getElementById("bowler-display").textContent = `${bowler.name}: ${oversBowled.toFixed(1)} (${bowler.wickets}-${bowler.runsConceded})`;
 
       // Update delivery tracker
       const deliveryTracker = document.getElementById("delivery-tracker");
@@ -496,7 +563,8 @@
     function confirmNewBatter() {
       const newBatter = document.getElementById("new-batter-select").value;
       if (newBatter) {
-        matchData.currentInnings.team1.wickets++;
+        const currentInnings = matchData.currentInnings === 1 ? matchData.innings1 : matchData.innings2;
+        currentInnings.wickets++;
         matchData.bowlers[matchData.currentBowlerIndex].wickets++;
         matchData.batters[matchData.batterOnStrike] = { name: newBatter, runs: 0, balls: 0 };
         document.getElementById("new-batter-popup").style.display = "none";
