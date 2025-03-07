@@ -396,4 +396,11 @@
       matchData.overs = parseInt(e.target.value);
     });
     document.getElementById("team1-players").addEventListener("input", (e) => {
-      matchData.team1.players = e.target
+      matchData.team1.players = e.target.value.split(",").map((player) => player.trim());
+    });
+    document.getElementById("team2-players").addEventListener("input", (e) => {
+      matchData.team2.players = e.target.value.split(",").map((player) => player.trim());
+    });
+  </script>
+</body>
+</html>
