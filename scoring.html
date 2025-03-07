@@ -73,12 +73,16 @@
       background: #4CAF50;
       color: white;
     }
+    .score-buttons button[onclick*="addRuns(4)"],
+    .score-buttons button[onclick*="addRuns(6)"] {
+      background: #1E90FF; /* Dark blue for 4 and 6 */
+    }
     .extras-buttons button {
       background: #2196F3;
       color: white;
     }
     .extras-buttons button.selected-extra {
-      background: #ccc;
+      background: red;
     }
     .action-buttons button {
       background: #FF9800;
@@ -111,6 +115,53 @@
       font-weight: bold;
       color: #2196F3;
       margin-bottom: 15px;
+    }
+    .delivery-tracker {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .delivery-circle {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+    }
+    .delivery-circle.blue {
+      background: #1E90FF; /* Blue for 4 runs */
+    }
+    .delivery-circle.red {
+      background: #FF4500; /* Red for 6 runs */
+    }
+    .delivery-circle.grey {
+      background: #808080; /* Grey for other runs */
+    }
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    .popup h2 {
+      margin-top: 0;
+    }
+    .popup select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    .popup button {
+      width: 100%;
     }
   </style>
 </head>
@@ -181,6 +232,7 @@
     </div>
     <div class="bowler-display">
       <strong>Bowler:</strong> <span id="bowler-display">0.0 (0-0)</span>
+      <div class="delivery-tracker" id="delivery-tracker"></div>
     </div>
     <div class="end-of-over" id="end-of-over" style="display: none;">End of Over!</div>
     <div class="score-buttons">
@@ -196,6 +248,7 @@
       <button onclick="selectExtra('no-ball')">No Ball</button>
       <button onclick="selectExtra('bye')">Bye</button>
       <button onclick="selectExtra('leg-bye')">Leg Bye</button>
+      <button onclick="undo()" style="background: red;">Undo</button>
     </div>
     <div class="action-buttons">
       <button onclick="swapBatters()">Swap Batters</button>
@@ -222,6 +275,13 @@
     </div>
   </div>
 
+  <!-- Popup for New Bowler Selection -->
+  <div id="new-bowler-popup" class="popup" style="display: none;">
+    <h2>Select New Bowler</h2>
+    <select id="new-bowler-select"></select>
+    <button onclick="confirmNewBowler()">Confirm</button>
+  </div>
+
   <script>
     // Data storage
     let matchData = {
@@ -238,6 +298,7 @@
       currentOver: [],
       selectedExtra: null,
       batterOnStrike: 0, // 0 for Batter 1, 1 for Batter 2
+      history: [], // Store last 6 actions for undo
     };
 
     // Screen navigation
@@ -286,6 +347,10 @@
 
     // Add runs to the score
     function addRuns(runs) {
+      // Save current state for undo
+      matchData.history.push(JSON.parse(JSON.stringify(matchData)));
+      if (matchData.history.length > 6) matchData.history.shift();
+
       if (matchData.selectedExtra) {
         matchData.currentInnings.team1.runs += runs + 1;
         matchData.bowlers[matchData.currentBowlerIndex].runsConceded += runs + 1;
@@ -300,10 +365,15 @@
         matchData.currentInnings.team1.balls++;
       }
 
+      // Swap batters for 1 or 3 runs
+      if (runs === 1 || runs === 3) {
+        swapBatters();
+      }
+
       // Check for end of over
       if (matchData.currentInnings.team1.balls % 6 === 0 && !matchData.selectedExtra) {
         document.getElementById("end-of-over").style.display = "block";
-        changeBowler();
+        showNewBowlerPopup();
       }
 
       updateDisplay();
@@ -338,6 +408,20 @@
       // Update bowler display
       const bowler = matchData.bowlers[matchData.currentBowlerIndex];
       document.getElementById("bowler-display").textContent = `${bowler.name}: ${Math.floor(matchData.currentInnings.team1.balls / 6)}.${matchData.currentInnings.team1.balls % 6} (${bowler.wickets}-${bowler.runsConceded})`;
+
+      // Update delivery tracker
+      const deliveryTracker = document.getElementById("delivery-tracker");
+      deliveryTracker.innerHTML = matchData.currentOver.map((ball) => {
+        let className = "grey";
+        let text = ball;
+        if (ball === 4) className = "blue";
+        if (ball === 6) className = "red";
+        if (ball.includes("wide")) text = "wd";
+        if (ball.includes("no-ball")) text = "NB";
+        if (ball.includes("leg-bye")) text = "LB";
+        if (ball.includes("bye")) text = "B";
+        return `<div class="delivery-circle ${className}">${text}</div>`;
+      }).join("");
     }
 
     // Swap batters
@@ -346,41 +430,30 @@
       updateDisplay();
     }
 
-    // Change bowler
-    function changeBowler() {
-      const newBowlerSelect = document.createElement("select");
+    // Show new bowler popup
+    function showNewBowlerPopup() {
+      const newBowlerSelect = document.getElementById("new-bowler-select");
       newBowlerSelect.innerHTML = matchData.team2.players.map((player) => `<option value="${player}">${player}</option>`).join("");
-      const confirmButton = document.createElement("button");
-      confirmButton.textContent = "Confirm";
-      confirmButton.onclick = () => {
-        matchData.bowlers[matchData.currentBowlerIndex].name = newBowlerSelect.value;
-        document.getElementById("end-of-over").style.display = "none";
-        updateDisplay();
-        document.body.removeChild(newBowlerSelect);
-        document.body.removeChild(confirmButton);
-      };
-      document.body.appendChild(newBowlerSelect);
-      document.body.appendChild(confirmButton);
+      document.getElementById("new-bowler-popup").style.display = "block";
     }
 
-    // Handle out type selection
-    function handleOutType() {
-      const outType = document.getElementById("out-type").value;
-      if (outType) {
-        document.getElementById("new-batter-group").style.display = "block";
-        const newBatterSelect = document.getElementById("new-batter");
-        newBatterSelect.innerHTML = matchData.team1.players.map((player) => `<option value="${player}">${player}</option>`).join("");
+    // Confirm new bowler
+    function confirmNewBowler() {
+      const newBowler = document.getElementById("new-bowler-select").value;
+      if (newBowler) {
+        matchData.bowlers[matchData.currentBowlerIndex].name = newBowler;
+        document.getElementById("new-bowler-popup").style.display = "none";
+        document.getElementById("end-of-over").style.display = "none";
+        matchData.currentOver = [];
+        updateDisplay();
       }
     }
 
-    // Dismiss batter
-    function dismissBatter() {
-      const newBatter = document.getElementById("new-batter").value;
-      if (newBatter) {
-        matchData.currentInnings.team1.wickets++;
-        matchData.bowlers[matchData.currentBowlerIndex].wickets++;
-        matchData.batters[matchData.batterOnStrike] = { name: newBatter, runs: 0, balls: 0 };
-        document.getElementById("new-batter-group").style.display = "none";
+    // Undo last action
+    function undo() {
+      if (matchData.history.length > 0) {
+        const prevState = matchData.history.pop();
+        Object.assign(matchData, prevState);
         updateDisplay();
       }
     }
