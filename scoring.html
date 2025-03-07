@@ -75,7 +75,7 @@
     }
     .score-buttons button[onclick*="addRuns(4)"],
     .score-buttons button[onclick*="addRuns(6)"] {
-      background: #1E90FF; /* Dark blue for 4 and 6 */
+      background: #FF69B4; /* Pink for 4 and 6 */
     }
     .extras-buttons button {
       background: #2196F3;
@@ -163,6 +163,19 @@
     .popup button {
       width: 100%;
     }
+    .batter-display {
+      display: flex;
+      gap: 20px; /* Increased space between batters */
+    }
+    .batter-display span {
+      font-weight: bold;
+      color: navy; /* Navy blue for batter names */
+    }
+    .batter-display span::before {
+      content: " | ";
+      font-weight: bold;
+      color: red; /* Red for the vertical line */
+    }
   </style>
 </head>
 <body>
@@ -228,7 +241,8 @@
       <strong>Team Score:</strong> <span id="team-score" class="team-score">0/0</span> | <strong>Overs:</strong> <span id="overs-display" class="overs-display">0.0</span>
     </div>
     <div class="batter-display">
-      <span id="batter1-display">0 (0)</span> | <span id="batter2-display">0 (0)</span>
+      <span id="batter1-display">0 (0)</span>
+      <span id="batter2-display">0 (0)</span>
     </div>
     <div class="bowler-display">
       <strong>Bowler:</strong> <span id="bowler-display">0.0 (0-0)</span>
@@ -265,14 +279,19 @@
         <option value="retired-hurt">Retired Hurt</option>
       </select>
     </div>
-    <div class="input-group" id="new-batter-group" style="display: none;">
-      <label for="new-batter">Select New Batter:</label>
-      <select id="new-batter"></select>
-      <button onclick="dismissBatter()">Confirm</button>
+    <div class="button-group" id="confirm-out-group" style="display: none;">
+      <button onclick="confirmOut()">Confirm</button>
     </div>
     <div class="button-group">
       <button onclick="prevScreen('select-players')">Back</button>
     </div>
+  </div>
+
+  <!-- Popup for New Batter Selection -->
+  <div id="new-batter-popup" class="popup" style="display: none;">
+    <h2>Select New Batter</h2>
+    <select id="new-batter-select"></select>
+    <button onclick="confirmNewBatter()">Confirm</button>
   </div>
 
   <!-- Popup for New Bowler Selection -->
@@ -445,6 +464,42 @@
         document.getElementById("new-bowler-popup").style.display = "none";
         document.getElementById("end-of-over").style.display = "none";
         matchData.currentOver = [];
+        updateDisplay();
+      }
+    }
+
+    // Handle out type selection
+    function handleOutType() {
+      const outType = document.getElementById("out-type").value;
+      if (outType) {
+        document.getElementById("confirm-out-group").style.display = "block";
+      }
+    }
+
+    // Confirm out and show new batter popup
+    function confirmOut() {
+      const outType = document.getElementById("out-type").value;
+      if (outType) {
+        document.getElementById("confirm-out-group").style.display = "none";
+        showNewBatterPopup();
+      }
+    }
+
+    // Show new batter popup
+    function showNewBatterPopup() {
+      const newBatterSelect = document.getElementById("new-batter-select");
+      newBatterSelect.innerHTML = matchData.team1.players.map((player) => `<option value="${player}">${player}</option>`).join("");
+      document.getElementById("new-batter-popup").style.display = "block";
+    }
+
+    // Confirm new batter
+    function confirmNewBatter() {
+      const newBatter = document.getElementById("new-batter-select").value;
+      if (newBatter) {
+        matchData.currentInnings.team1.wickets++;
+        matchData.bowlers[matchData.currentBowlerIndex].wickets++;
+        matchData.batters[matchData.batterOnStrike] = { name: newBatter, runs: 0, balls: 0 };
+        document.getElementById("new-batter-popup").style.display = "none";
         updateDisplay();
       }
     }
