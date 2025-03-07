@@ -94,6 +94,17 @@
     .batter-on-strike::before {
       content: "→ ";
       color: green;
+      font-weight: bold;
+    }
+    .team-score {
+      font-size: 20px;
+      font-weight: bold;
+      color: red;
+    }
+    .overs-display {
+      font-size: 20px;
+      font-weight: bold;
+      color: red;
     }
   </style>
 </head>
@@ -157,10 +168,10 @@
       <div>Overs: <span id="summary-overs"></span></div>
     </div>
     <div class="score-display">
-      <strong>Team Score:</strong> <span id="team-score">0/0</span> | <strong>Overs:</strong> <span id="overs-display">0.0</span>
+      <strong>Team Score:</strong> <span id="team-score" class="team-score">0/0</span> | <strong>Overs:</strong> <span id="overs-display" class="overs-display">0.0</span>
     </div>
     <div class="batter-display">
-      <strong>Batter 1:</strong> <span id="batter1-display">0 (0)</span> | <strong>Batter 2:</strong> <span id="batter2-display">0 (0)</span>
+      <span id="batter1-display">0 (0)</span> | <span id="batter2-display">0 (0)</span>
     </div>
     <div class="bowler-display">
       <strong>Bowler:</strong> <span id="bowler-display">0.0 (0-0)</span>
@@ -270,19 +281,19 @@
     function addRuns(runs) {
       if (matchData.selectedExtra) {
         matchData.currentInnings.team1.runs += runs + 1;
+        matchData.bowlers[matchData.currentBowlerIndex].runsConceded += runs + 1;
         matchData.currentOver.push(`${matchData.selectedExtra}+${runs}`);
         matchData.selectedExtra = null;
       } else {
         matchData.currentInnings.team1.runs += runs;
         matchData.batters[matchData.batterOnStrike].runs += runs;
         matchData.batters[matchData.batterOnStrike].balls++;
+        matchData.bowlers[matchData.currentBowlerIndex].runsConceded += runs;
         matchData.currentOver.push(runs);
       }
-      if (runs === 0) {
-        matchData.currentInnings.team1.balls++;
-        if (matchData.currentInnings.team1.balls % 6 === 0) {
-          matchData.currentInnings.team1.overs++;
-        }
+      matchData.currentInnings.team1.balls++;
+      if (matchData.currentInnings.team1.balls % 6 === 0) {
+        matchData.currentInnings.team1.overs++;
       }
       updateDisplay();
     }
@@ -326,11 +337,18 @@
 
     // Change bowler
     function changeBowler() {
-      const newBowler = prompt("Enter new bowler's name:");
-      if (newBowler) {
-        matchData.bowlers[matchData.currentBowlerIndex].name = newBowler;
+      const newBowlerSelect = document.createElement("select");
+      newBowlerSelect.innerHTML = matchData.team2.players.map((player) => `<option value="${player}">${player}</option>`).join("");
+      const confirmButton = document.createElement("button");
+      confirmButton.textContent = "Confirm";
+      confirmButton.onclick = () => {
+        matchData.bowlers[matchData.currentBowlerIndex].name = newBowlerSelect.value;
         updateDisplay();
-      }
+        document.body.removeChild(newBowlerSelect);
+        document.body.removeChild(confirmButton);
+      };
+      document.body.appendChild(newBowlerSelect);
+      document.body.appendChild(confirmButton);
     }
 
     // Handle out type selection
@@ -378,11 +396,4 @@
       matchData.overs = parseInt(e.target.value);
     });
     document.getElementById("team1-players").addEventListener("input", (e) => {
-      matchData.team1.players = e.target.value.split(",").map((player) => player.trim());
-    });
-    document.getElementById("team2-players").addEventListener("input", (e) => {
-      matchData.team2.players = e.target.value.split(",").map((player) => player.trim());
-    });
-  </script>
-</body>
-</html>
+      matchData.team1.players = e.target
