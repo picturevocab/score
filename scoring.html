@@ -82,7 +82,7 @@
       color: white;
     }
     .extras-buttons button.selected-extra {
-      background: red;
+      background: black; /* Black when selected */
     }
     .action-buttons button {
       background: #FF9800;
@@ -97,8 +97,12 @@
       font-weight: bold;
     }
     .batter-on-strike {
-      font-weight: bold;
       text-decoration: underline;
+    }
+    .batter-on-strike::before {
+      content: "→ ";
+      color: green;
+      font-weight: bold;
     }
     .team-score {
       font-size: 20px;
@@ -204,7 +208,7 @@
       <input type="text" id="team2-players" placeholder="Player 1, Player 2, Player 3">
     </div>
     <div class="button-group">
-      <button onclick="nextScreen('select-players')">Next</button>
+      <button onclick="validateAndNext()">Next</button>
     </div>
   </div>
 
@@ -352,6 +356,29 @@
       document.getElementById(screenId).classList.add("active");
     }
 
+    // Validate and proceed to the next screen
+    function validateAndNext() {
+      const team1Name = document.getElementById("team1-name").value;
+      const team2Name = document.getElementById("team2-name").value;
+      const overs = document.getElementById("overs").value;
+      const team1Players = document.getElementById("team1-players").value;
+      const team2Players = document.getElementById("team2-players").value;
+
+      if (!team1Name || !team2Name || !overs || !team1Players || !team2Players) {
+        alert("Please fill all fields before proceeding.");
+        return;
+      }
+
+      // Save data
+      matchData.team1.name = team1Name;
+      matchData.team2.name = team2Name;
+      matchData.overs = parseInt(overs);
+      matchData.team1.players = team1Players.split(",").map((player) => player.trim());
+      matchData.team2.players = team2Players.split(",").map((player) => player.trim());
+
+      nextScreen("select-players");
+    }
+
     // Initialize Select Players Screen
     function initSelectPlayersScreen() {
       const team1Players = matchData.team1.players;
@@ -397,6 +424,7 @@
         matchData.bowlers[matchData.currentBowlerIndex].runsConceded += runs + 1;
         matchData.currentOver.push(`${matchData.selectedExtra}+${runs}`);
         matchData.selectedExtra = null;
+        updateExtraButtons(); // Reset extra button color
       } else {
         currentInnings.runs += runs;
         matchData.batters[matchData.batterOnStrike].runs += runs;
@@ -482,7 +510,7 @@
       batter1Display.innerHTML = `${matchData.batters[0].name}: ${matchData.batters[0].runs} (${matchData.batters[0].balls})`;
       batter2Display.innerHTML = `${matchData.batters[1].name}: ${matchData.batters[1].runs} (${matchData.batters[1].balls})`;
 
-      // Add underline and bold to batter on strike
+      // Add underline and arrow to batter on strike
       if (matchData.batterOnStrike === 0) {
         batter1Display.classList.add("batter-on-strike");
         batter2Display.classList.remove("batter-on-strike");
@@ -591,6 +619,12 @@
           button.classList.remove("selected-extra");
         }
       });
+    }
+
+    // Select an extra
+    function selectExtra(extra) {
+      matchData.selectedExtra = extra;
+      updateExtraButtons();
     }
 
     // Event listeners for Create Match screen
