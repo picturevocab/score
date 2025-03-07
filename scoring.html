@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scoring Interface</title>
+  <title>Cricket Scoring App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,6 +16,12 @@
       text-align: center;
       margin-bottom: 20px;
     }
+    .screen {
+      display: none;
+    }
+    .screen.active {
+      display: block;
+    }
     .input-group {
       margin-bottom: 15px;
     }
@@ -24,18 +30,29 @@
       margin-bottom: 5px;
       font-size: 14px;
     }
-    .input-group input {
+    .input-group input, .input-group select {
       width: 100%;
       padding: 8px;
       box-sizing: border-box;
       font-size: 14px;
     }
-    .score-display, .batter-display, .bowler-display {
-      background: white;
-      padding: 10px;
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
       border-radius: 5px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
     }
     .score-buttons, .extras-buttons, .out-buttons, .action-buttons {
       display: flex;
@@ -71,251 +88,216 @@
     .selected-extra {
       background: #FF9800 !important;
     }
+    .match-summary {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body>
-  <h1>Scoring Interface</h1>
-
-  <!-- Team Names Input -->
-  <div class="input-group">
-    <label for="team1-name">Team 1 Name:</label>
-    <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
-  </div>
-  <div class="input-group">
-    <label for="team2-name">Team 2 Name:</label>
-    <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
-  </div>
-
-  <!-- Batter and Bowler Names Input -->
-  <div class="input-group">
-    <label for="batter1-name">Batter 1 Name:</label>
-    <input type="text" id="batter1-name" placeholder="Enter Batter 1 Name">
-  </div>
-  <div class="input-group">
-    <label for="batter2-name">Batter 2 Name:</label>
-    <input type="text" id="batter2-name" placeholder="Enter Batter 2 Name">
-  </div>
-  <div class="input-group">
-    <label for="bowler-name">Bowler Name:</label>
-    <input type="text" id="bowler-name" placeholder="Enter Bowler Name">
-  </div>
-
-  <!-- Score Display -->
-  <div class="score-display">
-    <strong>Team Score:</strong> <span id="team-score">0/0</span> | <strong>Overs:</strong> <span id="overs-display">0.0</span>
+  <!-- Screen 1: Create Match -->
+  <div id="create-match" class="screen active">
+    <h1>Create Match</h1>
+    <div class="input-group">
+      <label for="team1-name">Team 1 Name:</label>
+      <input type="text" id="team1-name" placeholder="Enter Team 1 Name">
+    </div>
+    <div class="input-group">
+      <label for="team2-name">Team 2 Name:</label>
+      <input type="text" id="team2-name" placeholder="Enter Team 2 Name">
+    </div>
+    <div class="input-group">
+      <label for="overs">Number of Overs:</label>
+      <input type="number" id="overs" placeholder="Enter Number of Overs">
+    </div>
+    <div class="input-group">
+      <label for="team1-players">Team 1 Players (comma-separated):</label>
+      <input type="text" id="team1-players" placeholder="Player 1, Player 2, Player 3">
+    </div>
+    <div class="input-group">
+      <label for="team2-players">Team 2 Players (comma-separated):</label>
+      <input type="text" id="team2-players" placeholder="Player 1, Player 2, Player 3">
+    </div>
+    <div class="button-group">
+      <button onclick="nextScreen('select-players')">Next</button>
+    </div>
   </div>
 
-  <!-- Batter Display -->
-  <div class="batter-display">
-    <strong>Batter 1:</strong> <span id="batter1-display">0 (0)</span> | <strong>Batter 2:</strong> <span id="batter2-display">0 (0)</span>
+  <!-- Screen 2: Select Players -->
+  <div id="select-players" class="screen">
+    <h1>Select Players</h1>
+    <div class="input-group">
+      <label for="batter1">Batter 1:</label>
+      <select id="batter1"></select>
+    </div>
+    <div class="input-group">
+      <label for="batter2">Batter 2:</label>
+      <select id="batter2"></select>
+    </div>
+    <div class="input-group">
+      <label for="bowler">Bowler:</label>
+      <select id="bowler"></select>
+    </div>
+    <div class="button-group">
+      <button onclick="prevScreen('create-match')">Back</button>
+      <button onclick="nextScreen('scoring-interface')">Start Scoring</button>
+    </div>
   </div>
 
-  <!-- Bowler Display -->
-  <div class="bowler-display">
-    <strong>Bowler:</strong> <span id="bowler-display">0.0 (0-0)</span>
+  <!-- Screen 3: Scoring Interface -->
+  <div id="scoring-interface" class="screen">
+    <h1>Scoring Interface</h1>
+    <div class="match-summary">
+      <strong>Match Summary:</strong>
+      <div>Team 1: <span id="summary-team1"></span></div>
+      <div>Team 2: <span id="summary-team2"></span></div>
+      <div>Overs: <span id="summary-overs"></span></div>
+    </div>
+    <div class="score-display">
+      <strong>Team Score:</strong> <span id="team-score">0/0</span> | <strong>Overs:</strong> <span id="overs-display">0.0</span>
+    </div>
+    <div class="batter-display">
+      <strong>Batter 1:</strong> <span id="batter1-display">0 (0)</span> | <strong>Batter 2:</strong> <span id="batter2-display">0 (0)</span>
+    </div>
+    <div class="bowler-display">
+      <strong>Bowler:</strong> <span id="bowler-display">0.0 (0-0)</span>
+    </div>
+    <div class="score-buttons">
+      <button onclick="addRuns(0)">0</button>
+      <button onclick="addRuns(1)">1</button>
+      <button onclick="addRuns(2)">2</button>
+      <button onclick="addRuns(3)">3</button>
+      <button onclick="addRuns(4)">4</button>
+      <button onclick="addRuns(6)">6</button>
+    </div>
+    <div class="extras-buttons">
+      <button onclick="selectExtra('wide')">Wide</button>
+      <button onclick="selectExtra('no-ball')">No Ball</button>
+      <button onclick="selectExtra('bye')">Bye</button>
+      <button onclick="selectExtra('leg-bye')">Leg Bye</button>
+    </div>
+    <div class="out-buttons">
+      <button onclick="dismissBatter('bowled')">Bowled</button>
+      <button onclick="dismissBatter('caught')">Caught</button>
+      <button onclick="dismissBatter('run-out')">Run Out</button>
+      <button onclick="dismissBatter('hit-wicket')">Hit Wicket</button>
+      <button onclick="dismissBatter('retired-hurt')">Retired Hurt</button>
+    </div>
+    <div class="action-buttons">
+      <button onclick="swapBatters()">Swap Batters</button>
+      <button onclick="changeBowler()">Change Bowler</button>
+      <button onclick="resetMatch()">Reset Match</button>
+    </div>
+    <div class="button-group">
+      <button onclick="prevScreen('select-players')">Back</button>
+    </div>
   </div>
 
-  <!-- Score Buttons -->
-  <div class="score-buttons">
-    <button onclick="addRuns(0)">0</button>
-    <button onclick="addRuns(1)">1</button>
-    <button onclick="addRuns(2)">2</button>
-    <button onclick="addRuns(3)">3</button>
-    <button onclick="addRuns(4)">4</button>
-    <button onclick="addRuns(6)">6</button>
-  </div>
-
-  <!-- Extras Buttons -->
-  <div class="extras-buttons">
-    <button onclick="selectExtra('wide')">Wide</button>
-    <button onclick="selectExtra('no-ball')">No Ball</button>
-    <button onclick="selectExtra('bye')">Bye</button>
-    <button onclick="selectExtra('leg-bye')">Leg Bye</button>
-  </div>
-
-  <!-- Out Buttons -->
-  <div class="out-buttons">
-    <button onclick="dismissBatter('bowled')">Bowled</button>
-    <button onclick="dismissBatter('caught')">Caught</button>
-    <button onclick="dismissBatter('run-out')">Run Out</button>
-    <button onclick="dismissBatter('hit-wicket')">Hit Wicket</button>
-    <button onclick="dismissBatter('retired-hurt')">Retired Hurt</button>
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="action-buttons">
-    <button onclick="swapBatters()">Swap Batters</button>
-    <button onclick="addBatter()">Add Batter</button>
-    <button onclick="addBowler()">Add Bowler</button>
-    <button onclick="undo()">Undo</button>
-  </div>
-
-  <!-- Firebase Integration -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCROI6H97ChhVbi0CARQ3NiQtuGP7GdSDY",
-      authDomain: "scoring-869fb.firebaseapp.com",
-      databaseURL: "https://scoring-869fb-default-rtdb.firebaseio.com",
-      projectId: "scoring-869fb",
-      storageBucket: "scoring-869fb.firebasestorage.app",
-      messagingSenderId: "360008597143",
-      appId: "1:360008597143:web:bb1e5911f726467db773d2",
-      measurementId: "G-1QFT7H1PTZ"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // Initialize score data
-    let scoreData = {
-      team1: { name: "INDIA", runs: 0, wickets: 0 },
-      team2: { name: "AUS", runs: 0, wickets: 0 },
+    // Data storage
+    let matchData = {
+      team1: { name: "", players: [] },
+      team2: { name: "", players: [] },
       overs: 0,
-      balls: 0,
-      batters: [
-        { name: "Batter 1", runs: 0, balls: 0, isOut: false },
-        { name: "Batter 2", runs: 0, balls: 0, isOut: false },
-      ],
-      bowlers: [
-        { name: "Bowler 1", overs: 0, wickets: 0, runsConceded: 0 },
-      ],
+      currentInnings: {
+        team1: { runs: 0, wickets: 0, overs: 0, balls: 0 },
+        team2: { runs: 0, wickets: 0, overs: 0, balls: 0 },
+      },
+      batters: [],
+      bowlers: [],
       currentBowlerIndex: 0,
       currentOver: [],
+      selectedExtra: null,
     };
 
-    // Track selected extra
-    let selectedExtra = null;
+    // Screen navigation
+    function nextScreen(screenId) {
+      document.querySelector(".screen.active").classList.remove("active");
+      document.getElementById(screenId).classList.add("active");
+      if (screenId === "select-players") initSelectPlayersScreen();
+      if (screenId === "scoring-interface") initScoringInterface();
+    }
 
-    // Save score data to Firebase
-    function saveScoreData(data) {
-      database.ref("scoreData").set(data);
-      updateDisplay();
+    function prevScreen(screenId) {
+      document.querySelector(".screen.active").classList.remove("active");
+      document.getElementById(screenId).classList.add("active");
+    }
+
+    // Initialize Select Players Screen
+    function initSelectPlayersScreen() {
+      const team1Players = matchData.team1.players;
+      const team2Players = matchData.team2.players;
+
+      const batter1Select = document.getElementById("batter1");
+      const batter2Select = document.getElementById("batter2");
+      const bowlerSelect = document.getElementById("bowler");
+
+      batter1Select.innerHTML = team1Players.map((player) => `<option value="${player}">${player}</option>`).join("");
+      batter2Select.innerHTML = team1Players.map((player) => `<option value="${player}">${player}</option>`).join("");
+      bowlerSelect.innerHTML = team2Players.map((player) => `<option value="${player}">${player}</option>`).join("");
+    }
+
+    // Initialize Scoring Interface
+    function initScoringInterface() {
+      document.getElementById("summary-team1").textContent = matchData.team1.name;
+      document.getElementById("summary-team2").textContent = matchData.team2.name;
+      document.getElementById("summary-overs").textContent = matchData.overs;
     }
 
     // Add runs to the score
     function addRuns(runs) {
-      if (selectedExtra) {
-        // Handle extras (e.g., Wide + runs)
-        scoreData.team1.runs += runs + 1; // Extra run + runs scored
-        scoreData.bowlers[scoreData.currentBowlerIndex].runsConceded += runs + 1;
-        scoreData.currentOver.push(`${selectedExtra}+${runs}`);
-        selectedExtra = null; // Reset selected extra
+      if (matchData.selectedExtra) {
+        matchData.currentInnings.team1.runs += runs + 1;
+        matchData.currentOver.push(`${matchData.selectedExtra}+${runs}`);
+        matchData.selectedExtra = null;
       } else {
-        // Normal runs
-        scoreData.team1.runs += runs;
-        scoreData.batters[0].runs += runs;
-        scoreData.batters[0].balls++;
-        scoreData.bowlers[scoreData.currentBowlerIndex].runsConceded += runs;
-        scoreData.balls++;
-        scoreData.currentOver.push(runs);
+        matchData.currentInnings.team1.runs += runs;
+        matchData.currentOver.push(runs);
       }
-      saveScoreData(scoreData);
-      updateExtraButtons();
+      updateDisplay();
     }
 
-    // Select an extra (Wide, No Ball, etc.)
+    // Select an extra
     function selectExtra(extra) {
-      selectedExtra = extra;
+      matchData.selectedExtra = extra;
       updateExtraButtons();
     }
 
-    // Update extra buttons to show selected state
-    function updateExtraButtons() {
-      const buttons = document.querySelectorAll(".extras-buttons button");
-      buttons.forEach((button) => {
-        if (button.textContent.toLowerCase() === selectedExtra) {
-          button.classList.add("selected-extra");
-        } else {
-          button.classList.remove("selected-extra");
-        }
-      });
-    }
-
-    // Dismiss a batter
-    function dismissBatter(mode) {
-      scoreData.team1.wickets++;
-      scoreData.bowlers[scoreData.currentBowlerIndex].wickets++;
-      scoreData.batters[0].isOut = true;
-      scoreData.currentOver.push(`W (${mode})`);
-      saveScoreData(scoreData);
-      addBatter(); // Add a new batter
-    }
-
-    // Swap batters
-    function swapBatters() {
-      const temp = scoreData.batters[0];
-      scoreData.batters[0] = scoreData.batters[1];
-      scoreData.batters[1] = temp;
-      saveScoreData(scoreData);
-    }
-
-    // Add a new batter
-    function addBatter() {
-      const newBatter = { name: `Batter ${scoreData.batters.length + 1}`, runs: 0, balls: 0, isOut: false };
-      scoreData.batters.push(newBatter);
-      scoreData.batters.shift(); // Remove the dismissed batter
-      saveScoreData(scoreData);
-    }
-
-    // Add a new bowler
-    function addBowler() {
-      const newBowler = { name: `Bowler ${scoreData.bowlers.length + 1}`, overs: 0, wickets: 0, runsConceded: 0 };
-      scoreData.bowlers.push(newBowler);
-      scoreData.currentBowlerIndex = scoreData.bowlers.length - 1;
-      saveScoreData(scoreData);
-    }
-
-    // Undo the last action
-    function undo() {
-      // Implement undo logic if needed
-      saveScoreData(scoreData);
-    }
-
-    // Update the display
+    // Update display
     function updateDisplay() {
-      // Team score
-      document.getElementById("team-score").textContent = `${scoreData.team1.runs}/${scoreData.team1.wickets}`;
-      document.getElementById("overs-display").textContent = `${Math.floor(scoreData.balls / 6)}.${scoreData.balls % 6}`;
-
-      // Batters
-      document.getElementById("batter1-display").textContent = `${scoreData.batters[0].name}: ${scoreData.batters[0].runs} (${scoreData.batters[0].balls})`;
-      document.getElementById("batter2-display").textContent = `${scoreData.batters[1].name}: ${scoreData.batters[1].runs} (${scoreData.batters[1].balls})`;
-
-      // Bowler
-      const bowler = scoreData.bowlers[scoreData.currentBowlerIndex];
-      document.getElementById("bowler-display").textContent = `${bowler.name}: ${Math.floor(scoreData.balls / 6)}.${scoreData.balls % 6} (${bowler.wickets}-${bowler.runsConceded})`;
+      document.getElementById("team-score").textContent = `${matchData.currentInnings.team1.runs}/${matchData.currentInnings.team1.wickets}`;
+      document.getElementById("overs-display").textContent = `${Math.floor(matchData.currentInnings.team1.balls / 6)}.${matchData.currentInnings.team1.balls % 6}`;
     }
 
-    // Update team names
+    // Reset match
+    function resetMatch() {
+      matchData.currentInnings.team1.runs = 0;
+      matchData.currentInnings.team1.wickets = 0;
+      matchData.currentInnings.team1.overs = 0;
+      matchData.currentInnings.team1.balls = 0;
+      matchData.currentOver = [];
+      updateDisplay();
+    }
+
+    // Event listeners for Create Match screen
     document.getElementById("team1-name").addEventListener("input", (e) => {
-      scoreData.team1.name = e.target.value;
-      saveScoreData(scoreData);
+      matchData.team1.name = e.target.value;
     });
     document.getElementById("team2-name").addEventListener("input", (e) => {
-      scoreData.team2.name = e.target.value;
-      saveScoreData(scoreData);
+      matchData.team2.name = e.target.value;
     });
-
-    // Update batter and bowler names
-    document.getElementById("batter1-name").addEventListener("input", (e) => {
-      scoreData.batters[0].name = e.target.value;
-      saveScoreData(scoreData);
+    document.getElementById("overs").addEventListener("input", (e) => {
+      matchData.overs = parseInt(e.target.value);
     });
-    document.getElementById("batter2-name").addEventListener("input", (e) => {
-      scoreData.batters[1].name = e.target.value;
-      saveScoreData(scoreData);
+    document.getElementById("team1-players").addEventListener("input", (e) => {
+      matchData.team1.players = e.target.value.split(",").map((player) => player.trim());
     });
-    document.getElementById("bowler-name").addEventListener("input", (e) => {
-      scoreData.bowlers[scoreData.currentBowlerIndex].name = e.target.value;
-      saveScoreData(scoreData);
+    document.getElementById("team2-players").addEventListener("input", (e) => {
+      matchData.team2.players = e.target.value.split(",").map((player) => player.trim());
     });
-
-    // Initial display update
-    updateDisplay();
   </script>
 </body>
 </html>
