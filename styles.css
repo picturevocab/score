@@ -58,7 +58,6 @@ body {
 .score-section {
   flex: 2;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: rgba(255, 0, 0, 0.8); /* Red background */
@@ -68,49 +67,33 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 3D depth */
 }
 
-.target-display {
-  background: #FF8C42; /* Dark orange */
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Raised button effect */
-}
-
-.score-row {
+.score-details {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  color: white;
+  font-size: 16px;
 }
 
 .current-score {
   font-size: 24px;
   font-weight: bold;
-  color: white;
 }
 
-.outs {
-  font-size: 18px;
+.overs {
   font-weight: bold;
-  color: #FF0000; /* Red for outs */
-}
-
-.overs-row {
-  font-size: 16px;
-  color: white;
-  margin-top: 5px;
-}
-
-.run-rate {
-  margin-left: 10px;
 }
 
 .match-overs {
-  font-size: 14px;
-  color: white;
-  margin-top: 5px;
+  font-style: italic;
+}
+
+.run-rate {
+  font-weight: bold;
+}
+
+.target {
+  font-weight: bold;
 }
 
 /* Animations for Score Updates */
@@ -120,10 +103,10 @@ body {
   100% { transform: scale(1); }
 }
 
-.current-score, .outs, .overs, .run-rate {
+.current-score, .overs, .run-rate, .target {
   transition: transform 0.3s ease;
 }
 
-.current-score.updated, .outs.updated, .overs.updated, .run-rate.updated {
+.current-score.updated, .overs.updated, .run-rate.updated, .target.updated {
   animation: scoreUpdate 0.5s;
 }
