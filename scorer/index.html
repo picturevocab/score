@@ -9,11 +9,15 @@
 <body>
   <!-- Top Black Score Bar -->
   <div id="top-score-bar">
-    <span id="top-team1">Team 1: 0/0</span>
-    <span id="top-overs">- 0.0 (20-Overs)</span>
-    <span id="top-crr">CRR: 0.00</span>
-    <span id="top-target">[Target: 0]</span>
-    <span id="top-team2">Team 2</span>
+    <div class="row1">
+      <span id="top-team1">Team 1: 0/0</span>
+      <span id="top-overs">- 0.0 (20-Overs)</span>
+    </div>
+    <div class="row2">
+      <span id="top-crr">CRR: 0.00</span>
+      <span id="top-target">[Target: 0]</span>
+      <span id="top-team2">Team 2</span>
+    </div>
   </div>
 
   <!-- Match Setup Screen -->
@@ -75,22 +79,9 @@
             <option value="6">6</option>
           </select>
         </div>
-        <button id="confirm-extra" class="confirm-button">Confirm Extra</button>
+        <button id="confirm-extra" class="confirm-button">Confirm</button>
       </div>
-      <div class="outs">
-        <div class="extra-group">
-          <label for="out-type">How Out:</label>
-          <select id="out-type">
-            <option value="none">No Out</option>
-            <option value="bowled">Bowled</option>
-            <option value="caught">Caught</option>
-            <option value="hit-wicket">Hit Wicket</option>
-            <option value="run-out">Run Out</option>
-            <option value="retired-hurt">Retired Hurt</option>
-          </select>
-        </div>
-        <button id="confirm-out" class="confirm-button">Confirm Out</button>
-      </div>
+      <button id="add-wicket" class="confirm-button">Add Wicket</button>
       <button id="undo">Undo Last Ball</button>
     </div>
   </div>
