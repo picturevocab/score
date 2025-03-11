@@ -47,6 +47,8 @@ button:hover {
 
 .confirm-button {
   background: #ff0000; /* Red color for confirm buttons */
+  padding: 5px 10px; /* Smaller button */
+  font-size: 14px;
 }
 
 .confirm-button:hover {
@@ -63,10 +65,16 @@ button:hover {
   color: white;
   padding: 10px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 5px;
   font-size: 16px;
   font-weight: bold;
+}
+
+#top-score-bar .row1, #top-score-bar .row2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* Live Scoring Interface */
@@ -76,7 +84,7 @@ button:hover {
   gap: 10px;
 }
 
-.runs, .extras, .outs {
+.runs, .extras {
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -87,14 +95,19 @@ button:hover {
   flex: 1 1 calc(25% - 10px);
 }
 
+.extras {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .extra-group {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.extras, .outs {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+#add-wicket {
+  width: 100%;
+  max-width: 150px;
 }
