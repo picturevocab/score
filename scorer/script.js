@@ -19,7 +19,9 @@ const liveScoring = document.getElementById('live-scoring');
 const matchComplete = document.getElementById('match-complete');
 const startMatchBtn = document.getElementById('start-match');
 const restartBtn = document.getElementById('restart');
-const start2ndInningsBtn = document.getElementById('start-2nd-innings');
+const endInningsPopup = document.getElementById('end-innings-popup');
+const confirm2ndInningsBtn = document.getElementById('confirm-2nd-innings');
+const undoLastBallBtn = document.getElementById('undo-last-ball');
 
 // Top Score Bar Elements
 const topTeam1 = document.getElementById('top-team1');
@@ -50,13 +52,22 @@ startMatchBtn.addEventListener('click', () => {
   updateScoreTicker();
 });
 
-// Start 2nd Innings
-start2ndInningsBtn.addEventListener('click', () => {
+// End of Innings Pop-up
+confirm2ndInningsBtn.addEventListener('click', () => {
   currentInnings = 2;
   target = score.runs + 1;
   score = { runs: 0, wickets: 0, overs: 0, balls: 0, extras: 0 };
-  start2ndInningsBtn.classList.add('hidden');
+  endInningsPopup.classList.add('hidden');
   updateScoreTicker();
+});
+
+undoLastBallBtn.addEventListener('click', () => {
+  if (history.length > 0) {
+    const last = history.pop();
+    score = { ...last };
+    endInningsPopup.classList.add('hidden');
+    updateScoreTicker();
+  }
 });
 
 // Live Scoring
@@ -104,15 +115,20 @@ function addRuns(runs) {
     score.balls = 0;
   }
   updateScoreTicker();
+  checkEndOfInnings();
 }
 
 function addWicket() {
   history.push({ ...score });
   score.wickets++;
-  if (score.wickets === 10) {
-    endInnings();
-  }
   updateScoreTicker();
+  checkEndOfInnings();
+}
+
+function checkEndOfInnings() {
+  if (score.overs >= totalOvers || score.wickets === 10) {
+    endInningsPopup.classList.remove('hidden');
+  }
 }
 
 function updateScoreTicker() {
@@ -135,14 +151,6 @@ function updateScoreTicker() {
     target: currentInnings === 2 ? target : null,
   };
   database.ref('score').set(tickerData);
-}
-
-function endInnings() {
-  if (currentInnings === 1) {
-    start2ndInningsBtn.classList.remove('hidden');
-  } else {
-    endMatch();
-  }
 }
 
 function endMatch() {
