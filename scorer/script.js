@@ -1,9 +1,25 @@
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  databaseURL: "YOUR_DATABASE_URL",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 // Match Setup
 const matchSetup = document.getElementById('match-setup');
 const liveScoring = document.getElementById('live-scoring');
 const matchComplete = document.getElementById('match-complete');
 const startMatchBtn = document.getElementById('start-match');
 const restartBtn = document.getElementById('restart');
+const start2ndInningsBtn = document.getElementById('start-2nd-innings');
 
 // Top Score Bar Elements
 const topTeam1 = document.getElementById('top-team1');
@@ -31,6 +47,15 @@ startMatchBtn.addEventListener('click', () => {
 
   matchSetup.classList.add('hidden');
   liveScoring.classList.remove('hidden');
+  updateScoreTicker();
+});
+
+// Start 2nd Innings
+start2ndInningsBtn.addEventListener('click', () => {
+  currentInnings = 2;
+  target = score.runs + 1;
+  score = { runs: 0, wickets: 0, overs: 0, balls: 0, extras: 0 };
+  start2ndInningsBtn.classList.add('hidden');
   updateScoreTicker();
 });
 
@@ -98,7 +123,7 @@ function updateScoreTicker() {
   topTarget.textContent = currentInnings === 2 ? `[Target: ${target}]` : '';
   topTeam2.textContent = team2;
 
-  // Send data to the score ticker
+  // Send data to Firebase
   const tickerData = {
     team1: team1,
     team2: team2,
@@ -109,15 +134,12 @@ function updateScoreTicker() {
     crr: (score.runs / (score.overs + score.balls / 6)).toFixed(2),
     target: currentInnings === 2 ? target : null,
   };
-  window.parent.postMessage(tickerData, '*');
+  database.ref('score').set(tickerData);
 }
 
 function endInnings() {
   if (currentInnings === 1) {
-    target = score.runs + 1;
-    currentInnings = 2;
-    score = { runs: 0, wickets: 0, overs: 0, balls: 0, extras: 0 };
-    updateScoreTicker();
+    start2ndInningsBtn.classList.remove('hidden');
   } else {
     endMatch();
   }
