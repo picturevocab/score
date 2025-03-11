@@ -45,6 +45,30 @@ button:hover {
   background: #0056b3;
 }
 
+.confirm-button {
+  background: #ff0000; /* Red color for confirm buttons */
+}
+
+.confirm-button:hover {
+  background: #cc0000; /* Darker red on hover */
+}
+
+/* Top Black Score Bar */
+#top-score-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: black;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 /* Live Scoring Interface */
 .score-controls {
   display: flex;
@@ -67,4 +91,10 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+.extras, .outs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
