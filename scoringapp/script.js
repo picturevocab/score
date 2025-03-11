@@ -17,6 +17,11 @@ startMatchBtn.addEventListener('click', () => {
   totalOvers = parseInt(document.getElementById('overs').value);
   tossWinner = document.getElementById('toss').value;
 
+  if (!team1 || !team2 || !totalOvers || totalOvers < 1 || totalOvers > 20) {
+    alert('Please fill all fields correctly. Overs must be between 1 and 20.');
+    return;
+  }
+
   matchSetup.classList.add('hidden');
   liveScoring.classList.remove('hidden');
   updateScoreTicker();
@@ -92,7 +97,7 @@ function updateScoreTicker() {
   };
 
   // Send data to the score ticker
-  window.parent.postMessage(tickerData, 'https://picturevocab.github.io');
+  window.parent.postMessage(tickerData, '*');
 }
 
 function endInnings() {
