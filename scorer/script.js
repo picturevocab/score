@@ -19,9 +19,7 @@ const liveScoring = document.getElementById('live-scoring');
 const matchComplete = document.getElementById('match-complete');
 const startMatchBtn = document.getElementById('start-match');
 const restartBtn = document.getElementById('restart');
-const endInningsPopup = document.getElementById('end-innings-popup');
-const confirm2ndInningsBtn = document.getElementById('confirm-2nd-innings');
-const undoLastBallBtn = document.getElementById('undo-last-ball');
+const start2ndInningsBtn = document.getElementById('start-2nd-innings');
 
 // Top Score Bar Elements
 const topTeam1 = document.getElementById('top-team1');
@@ -52,22 +50,13 @@ startMatchBtn.addEventListener('click', () => {
   updateScoreTicker();
 });
 
-// End of Innings Pop-up
-confirm2ndInningsBtn.addEventListener('click', () => {
+// Start 2nd Innings
+start2ndInningsBtn.addEventListener('click', () => {
   currentInnings = 2;
   target = score.runs + 1;
   score = { runs: 0, wickets: 0, overs: 0, balls: 0, extras: 0 };
-  endInningsPopup.classList.add('hidden');
+  start2ndInningsBtn.classList.add('hidden');
   updateScoreTicker();
-});
-
-undoLastBallBtn.addEventListener('click', () => {
-  if (history.length > 0) {
-    const last = history.pop();
-    score = { ...last };
-    endInningsPopup.classList.add('hidden');
-    updateScoreTicker();
-  }
 });
 
 // Live Scoring
@@ -127,7 +116,7 @@ function addWicket() {
 
 function checkEndOfInnings() {
   if (currentInnings === 1 && (score.overs >= totalOvers || score.wickets === 10)) {
-    endInningsPopup.classList.remove('hidden');
+    start2ndInningsBtn.classList.remove('hidden');
   }
 }
 
