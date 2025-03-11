@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cricket Scoring App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Match Setup Screen -->
+  <div id="match-setup" class="screen">
+    <h1>Match Setup</h1>
+    <div class="input-group">
+      <label for="team1">Team 1 Name:</label>
+      <input type="text" id="team1" placeholder="Enter Team 1 Name">
+    </div>
+    <div class="input-group">
+      <label for="team2">Team 2 Name:</label>
+      <input type="text" id="team2" placeholder="Enter Team 2 Name">
+    </div>
+    <div class="input-group">
+      <label for="overs">Match Overs:</label>
+      <input type="number" id="overs" min="1" max="20" placeholder="Enter Overs (1-20)">
+    </div>
+    <div class="input-group">
+      <label for="toss">Toss Winner:</label>
+      <select id="toss">
+        <option value="team1">Team 1</option>
+        <option value="team2">Team 2</option>
+      </select>
+    </div>
+    <button id="start-match">Start Match</button>
+  </div>
+
+  <!-- Live Scoring Interface -->
+  <div id="live-scoring" class="screen hidden">
+    <h1>Live Scoring</h1>
+    <div class="score-controls">
+      <div class="runs">
+        <button data-runs="0">0</button>
+        <button data-runs="1">1</button>
+        <button data-runs="2">2</button>
+        <button data-runs="3">3</button>
+        <button data-runs="4">4</button>
+        <button data-runs="5">5</button>
+        <button data-runs="6">6</button>
+      </div>
+      <div class="extras">
+        <div class="extra-group">
+          <label for="extra-type">Select Extra:</label>
+          <select id="extra-type">
+            <option value="none">No Extra</option>
+            <option value="wide">Wide</option>
+            <option value="no-ball">No Ball</option>
+          </select>
+        </div>
+        <div class="extra-group">
+          <label for="extra-runs">Select Runs:</label>
+          <select id="extra-runs">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+        <button id="confirm-extra">Confirm Extra</button>
+      </div>
+      <div class="outs">
+        <select id="out-type">
+          <option value="none">No Out</option>
+          <option value="bowled">Bowled</option>
+          <option value="caught">Caught</option>
+          <option value="run-out">Run Out</option>
+          <option value="hit-wicket">Hit Wicket</option>
+          <option value="retired-hurt">Retired Hurt</option>
+        </select>
+        <button id="confirm-out">Confirm Out</button>
+      </div>
+      <button id="undo">Undo Last Ball</button>
+    </div>
+  </div>
+
+  <!-- Match Completion Screen -->
+  <div id="match-complete" class="screen hidden">
+    <h1>Match Complete!</h1>
+    <p id="winner-text"></p>
+    <button id="restart">Restart Match</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
