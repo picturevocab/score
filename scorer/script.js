@@ -5,6 +5,13 @@ const matchComplete = document.getElementById('match-complete');
 const startMatchBtn = document.getElementById('start-match');
 const restartBtn = document.getElementById('restart');
 
+// Top Score Bar Elements
+const topTeam1 = document.getElementById('top-team1');
+const topOvers = document.getElementById('top-overs');
+const topCrr = document.getElementById('top-crr');
+const topTarget = document.getElementById('top-target');
+const topTeam2 = document.getElementById('top-team2');
+
 let team1, team2, totalOvers, tossWinner;
 let currentInnings = 1;
 let score = { runs: 0, wickets: 0, overs: 0, balls: 0, extras: 0 };
@@ -87,6 +94,14 @@ function addWicket() {
 }
 
 function updateScoreTicker() {
+  // Update Top Score Bar
+  topTeam1.textContent = `${team1}: ${score.runs}/${score.wickets}`;
+  topOvers.textContent = `- ${score.overs}.${score.balls} (${totalOvers}-Overs)`;
+  topCrr.textContent = `CRR: ${(score.runs / (score.overs + score.balls / 6)).toFixed(2)}`;
+  topTarget.textContent = currentInnings === 2 ? `[Target: ${target}]` : '';
+  topTeam2.textContent = team2;
+
+  // Send data to the score ticker
   const tickerData = {
     team1: team1,
     team2: team2,
@@ -97,8 +112,6 @@ function updateScoreTicker() {
     crr: (score.runs / (score.overs + score.balls / 6)).toFixed(2),
     target: currentInnings === 2 ? target : null,
   };
-
-  // Send data to the score ticker
   window.parent.postMessage(tickerData, '*');
 }
 
