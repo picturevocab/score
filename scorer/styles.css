@@ -69,12 +69,14 @@ button:hover {
   gap: 5px;
   font-size: 16px;
   font-weight: bold;
+  text-align: center; /* Center-align text */
 }
 
 #top-score-bar .row1, #top-score-bar .row2 {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 10px;
 }
 
 /* Live Scoring Interface */
@@ -107,7 +109,7 @@ button:hover {
   gap: 5px;
 }
 
-#add-wicket {
+#add-wicket, #start-2nd-innings {
   width: 100%;
   max-width: 150px;
 }
