@@ -39,8 +39,7 @@ const runsButtons = document.querySelectorAll('.runs button');
 const extraType = document.getElementById('extra-type');
 const extraRuns = document.getElementById('extra-runs');
 const confirmExtraBtn = document.getElementById('confirm-extra');
-const outType = document.getElementById('out-type');
-const confirmOutBtn = document.getElementById('confirm-out');
+const addWicketBtn = document.getElementById('add-wicket');
 const undoBtn = document.getElementById('undo');
 
 runsButtons.forEach(button => {
@@ -57,10 +56,8 @@ confirmExtraBtn.addEventListener('click', () => {
   }
 });
 
-confirmOutBtn.addEventListener('click', () => {
-  if (outType.value !== 'none') {
-    addWicket();
-  }
+addWicketBtn.addEventListener('click', () => {
+  addWicket();
 });
 
 undoBtn.addEventListener('click', () => {
