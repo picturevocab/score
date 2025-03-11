@@ -31,6 +31,7 @@ body {
 .team-section {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 60px;
@@ -52,6 +53,13 @@ body {
   font-weight: bold;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Subtle shadow for 3D effect */
+}
+
+.innings {
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  margin-top: 5px;
 }
 
 /* Middle Section: Score & Match Details */
@@ -92,8 +100,16 @@ body {
   font-weight: bold;
 }
 
+.target-rectangle {
+  background: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 3D effect */
+}
+
 .target {
   font-weight: bold;
+  color: #333; /* Dark text for contrast */
 }
 
 /* Animations for Score Updates */
