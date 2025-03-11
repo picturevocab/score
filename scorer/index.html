@@ -85,7 +85,6 @@
         <button id="confirm-extra" class="confirm-button">Confirm</button>
       </div>
       <button id="add-wicket" class="confirm-button">Add Wicket</button>
-      <button id="start-2nd-innings" class="confirm-button hidden">Start 2nd Innings</button>
       <button id="undo">Undo Last Ball</button>
     </div>
   </div>
@@ -95,6 +94,16 @@
     <h1>Match Complete!</h1>
     <p id="winner-text"></p>
     <button id="restart">Restart Match</button>
+  </div>
+
+  <!-- End of Innings Pop-up -->
+  <div id="end-innings-popup" class="popup hidden">
+    <div class="popup-content">
+      <h2>End of Innings</h2>
+      <p>Do you want to start the 2nd innings?</p>
+      <button id="confirm-2nd-innings">Confirm</button>
+      <button id="undo-last-ball">Undo Last Ball</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
