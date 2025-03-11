@@ -7,6 +7,15 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Top Black Score Bar -->
+  <div id="top-score-bar">
+    <span id="top-team1">Team 1: 0/0</span>
+    <span id="top-overs">- 0.0 (20-Overs)</span>
+    <span id="top-crr">CRR: 0.00</span>
+    <span id="top-target">[Target: 0]</span>
+    <span id="top-team2">Team 2</span>
+  </div>
+
   <!-- Match Setup Screen -->
   <div id="match-setup" class="screen">
     <h1>Match Setup</h1>
@@ -66,18 +75,21 @@
             <option value="6">6</option>
           </select>
         </div>
-        <button id="confirm-extra">Confirm Extra</button>
+        <button id="confirm-extra" class="confirm-button">Confirm Extra</button>
       </div>
       <div class="outs">
-        <select id="out-type">
-          <option value="none">No Out</option>
-          <option value="bowled">Bowled</option>
-          <option value="caught">Caught</option>
-          <option value="run-out">Run Out</option>
-          <option value="hit-wicket">Hit Wicket</option>
-          <option value="retired-hurt">Retired Hurt</option>
-        </select>
-        <button id="confirm-out">Confirm Out</button>
+        <div class="extra-group">
+          <label for="out-type">How Out:</label>
+          <select id="out-type">
+            <option value="none">No Out</option>
+            <option value="bowled">Bowled</option>
+            <option value="caught">Caught</option>
+            <option value="hit-wicket">Hit Wicket</option>
+            <option value="run-out">Run Out</option>
+            <option value="retired-hurt">Retired Hurt</option>
+          </select>
+        </div>
+        <button id="confirm-out" class="confirm-button">Confirm Out</button>
       </div>
       <button id="undo">Undo Last Ball</button>
     </div>
