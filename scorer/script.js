@@ -126,7 +126,7 @@ function addWicket() {
 }
 
 function checkEndOfInnings() {
-  if (score.overs >= totalOvers || score.wickets === 10) {
+  if (currentInnings === 1 && (score.overs >= totalOvers || score.wickets === 10)) {
     endInningsPopup.classList.remove('hidden');
   }
 }
