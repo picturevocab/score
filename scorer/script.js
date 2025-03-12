@@ -1,17 +1,3 @@
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  databaseURL: "YOUR_DATABASE_URL",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-};
-
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
 
 // Match Setup
 const matchSetup = document.getElementById('match-setup');
@@ -22,13 +8,13 @@ const restartBtn = document.getElementById('restart');
 const start2ndInningsBtn = document.getElementById('start-2nd-innings');
 
 // Top Score Bar Elements
-const topTeam1 = document.getElementById('top-team1');
+const topBattingTeam = document.getElementById('top-batting-team');
 const topOvers = document.getElementById('top-overs');
 const topCrr = document.getElementById('top-crr');
 const topTarget = document.getElementById('top-target');
-const topTeam2 = document.getElementById('top-team2');
+const topBowlingTeam = document.getElementById('top-bowling-team');
 
-let team1, team2, totalOvers, tossWinner;
+let team1, team2, totalOvers, tossWinner, tossChoice;
 let currentInnings = 1;
 let score = { runs: 0, wickets: 0, overs: 0, balls: 0, extras: 0 };
 let target = 0;
@@ -39,14 +25,27 @@ startMatchBtn.addEventListener('click', () => {
   team2 = document.getElementById('team2').value;
   totalOvers = parseInt(document.getElementById('overs').value);
   tossWinner = document.getElementById('toss').value;
+  tossChoice = document.getElementById('toss-choice').value;
 
+  // Validate inputs
   if (!team1 || !team2 || !totalOvers || totalOvers < 1 || totalOvers > 20) {
     alert('Please fill all fields correctly. Overs must be between 1 and 20.');
     return;
   }
 
+  // Set batting and bowling teams based on toss
+  const battingTeam = tossChoice === 'bat' ? (tossWinner === 'team1' ? team1 : team2) : (tossWinner === 'team1' ? team2 : team1);
+  const bowlingTeam = tossChoice === 'bat' ? (tossWinner === 'team1' ? team2 : team1) : (tossWinner === 'team1' ? team1 : team2);
+
+  // Update score bar
+  topBattingTeam.textContent = `${battingTeam}: 0/0`;
+  topBowlingTeam.textContent = bowlingTeam;
+
+  // Hide match setup screen and show live scoring screen
   matchSetup.classList.add('hidden');
   liveScoring.classList.remove('hidden');
+
+  // Update the score ticker
   updateScoreTicker();
 });
 
@@ -122,11 +121,10 @@ function checkEndOfInnings() {
 
 function updateScoreTicker() {
   // Update Top Score Bar
-  topTeam1.textContent = `${team1}: ${score.runs}/${score.wickets}`;
+  topBattingTeam.textContent = `${team1}: ${score.runs}/${score.wickets}`;
   topOvers.textContent = `- ${score.overs}.${score.balls} (${totalOvers}-Overs)`;
   topCrr.textContent = `CRR: ${(score.runs / (score.overs + score.balls / 6)).toFixed(2)}`;
   topTarget.textContent = currentInnings === 2 ? `[Target: ${target}]` : '';
-  topTeam2.textContent = team2;
 
   // Send data to Firebase
   const tickerData = {
