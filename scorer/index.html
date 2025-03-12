@@ -13,13 +13,13 @@
   <!-- Top Black Score Bar -->
   <div id="top-score-bar">
     <div class="row1">
-      <span id="top-team1">Team 1: 0/0</span>
+      <span id="top-batting-team">Batting Team: 0/0</span>
       <span id="top-overs">- 0.0 (20-Overs)</span>
     </div>
     <div class="row2">
       <span id="top-crr">CRR: 0.00</span>
       <span id="top-target">[Target: 0]</span>
-      <span id="top-team2">Team 2</span>
+      <span id="top-bowling-team">Bowling Team</span>
     </div>
     <button id="start-2nd-innings" class="hidden">Start 2nd Innings</button>
   </div>
@@ -44,6 +44,13 @@
       <select id="toss">
         <option value="team1">Team 1</option>
         <option value="team2">Team 2</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label for="toss-choice">Choose to Bat or Bowl:</label>
+      <select id="toss-choice">
+        <option value="bat">Bat</option>
+        <option value="bowl">Bowl</option>
       </select>
     </div>
     <button id="start-match">Start Match</button>
