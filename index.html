@@ -4,7 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cricket Scoring App</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .input-row span {
+      font-weight: bold;
+    }
+    .input-row input {
+      width: 60%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .hidden {
+      display: none;
+    }
+    .score-display {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .score-display p {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    .highlight-yellow {
+      background-color: yellow;
+      padding: 5px;
+      border-radius: 4px;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .buttons button {
+      width: 60px;
+      height: 60px;
+      font-size: 18px;
+      margin: 5px;
+    }
+    .extras-button {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .extras-button:hover {
+      background-color: #c82333;
+    }
+    .wicket-button {
+      background-color: #ffc107;
+      color: #000;
+    }
+    .wicket-button:hover {
+      background-color: #e0a800;
+    }
+    .undo-button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .undo-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
   <!-- Screen 1: Create Match -->
@@ -34,9 +133,9 @@
     <div class="container">
       <!-- Score Display -->
       <div class="score-display">
-        <p id="team1ScoreDisplay">Australia 140/3 (15.1)</p>
-        <p id="team2ScoreDisplay">India 130/3 (15.1)</p>
-        <p id="matchOversDisplay">(40 Overs Match)</p>
+        <p id="team1ScoreDisplay">Team 1: 0/0 (0.0)</p>
+        <p id="team2ScoreDisplay">Team 2: 0/0 (0.0)</p>
+        <p id="matchOversDisplay">(0 Overs Match)</p>
       </div>
       <!-- Team 1 Section -->
       <div class="team-section">
@@ -99,7 +198,7 @@
     let history = { team1: [], team2: [] }; // To store last 6 inputs for undo
 
     // Google Apps Script URL
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz1mbfq-uLutaFnQOQv3Fm4LT5ZVzCEeSkf_vUISDO-/dev';
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz4UhypsruR_B-RkP83_NIMjlbw9RzSD9w-z7Io_CYFiE3wgdNtaZDimH6My_i-LYDSQA/exec';
 
     // Screen elements
     const teamNamesScreen = document.getElementById('teamNamesScreen');
@@ -181,23 +280,10 @@
 
     // Send data to Google Sheet
     function sendDataToSheet() {
-      const data = {
-        team1Name: team1.name,
-        team1Score: team1.score,
-        team1Wickets: team1.wickets,
-        team1Overs: team1.overs,
-        team2Name: team2.name,
-        team2Score: team2.score,
-        team2Wickets: team2.wickets,
-        team2Overs: team2.overs,
-      };
+      const queryParams = `team1Name=${encodeURIComponent(team1.name)}&team1Score=${encodeURIComponent(team1.score)}&team1Wickets=${encodeURIComponent(team1.wickets)}&team1Overs=${encodeURIComponent(team1.overs)}&team2Name=${encodeURIComponent(team2.name)}&team2Score=${encodeURIComponent(team2.score)}&team2Wickets=${encodeURIComponent(team2.wickets)}&team2Overs=${encodeURIComponent(team2.overs)}`;
 
-      fetch(scriptUrl, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      fetch(`${scriptUrl}?${queryParams}`, {
+        method: 'GET',
       })
         .then(response => response.json())
         .then(result => {
@@ -205,12 +291,12 @@
           if (result.success) {
             alert('Score updated successfully!');
           } else {
-            alert('Failed to update score.');
+            alert('Failed to update score. Error: ' + (result.error || 'Unknown error'));
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Failed to update score.');
+          alert('Failed to update score. Check console for details.');
         });
     }
   </script>
