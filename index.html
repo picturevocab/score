@@ -99,7 +99,7 @@
     let history = { team1: [], team2: [] }; // To store last 6 inputs for undo
 
     // Google Apps Script URL
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwuD5uQdcvSWnBds6XBvw0bgVQjXRg_7bkK8SDLyyqv73VKdDOY1rssKE4LMWKpvKKstw/exec';
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz1mbfq-uLutaFnQOQv3Fm4LT5ZVzCEeSkf_vUISDO-/dev';
 
     // Screen elements
     const teamNamesScreen = document.getElementById('teamNamesScreen');
@@ -200,8 +200,14 @@
         },
       })
         .then(response => response.text())
-        .then(result => console.log('Score updated successfully'))
-        .catch(error => console.error('Error:', error));
+        .then(result => {
+          console.log('Response:', result); // Debugging
+          alert('Score updated successfully!');
+        })
+        .catch(error => {
+          console.error('Error:', error); // Debugging
+          alert('Failed to update score.');
+        });
     }
   </script>
 </body>
