@@ -1,128 +1,118 @@
-/* General Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* styles.css */
 body {
   font-family: Arial, sans-serif;
-  background: transparent;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px;
 }
 
-/* Score Ticker Container */
-.score-ticker {
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+.input-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
+}
+
+.input-row span {
+  font-weight: bold;
+}
+
+.input-row input {
+  width: 60%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button[type="submit"] {
   width: 100%;
-  height: 80px;
-  background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-  backdrop-filter: blur(10px); /* Glassmorphism effect */
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  padding: 0 20px;
-  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5); /* 3D shadow effect */
-}
-
-/* Team Sections */
-.team-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 3D depth */
   padding: 10px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.team1 {
-  background: linear-gradient(145deg, #1e3c72, #2a5298); /* Blue gradient */
+button[type="submit"]:hover {
+  background-color: #218838;
 }
 
-.team2 {
-  background: linear-gradient(145deg, #4CAF50, #45a049); /* Green gradient */
+.score-display {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.team-name {
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Subtle shadow for 3D effect */
-}
-
-.innings {
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  margin-top: 5px;
-}
-
-/* Middle Section: Score & Match Details */
-.score-section {
-  flex: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(255, 0, 0, 0.8); /* Red background */
-  border-radius: 10px;
-  padding: 10px;
-  margin: 0 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 3D depth */
-}
-
-.score-details {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  color: white;
+.score-display p {
+  margin: 5px 0;
   font-size: 16px;
 }
 
-.current-score {
-  font-size: 24px;
-  font-weight: bold;
+.highlight-yellow {
+  background-color: yellow;
+  padding: 5px;
+  border-radius: 4px;
 }
 
-.overs {
-  font-weight: bold;
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.match-overs {
-  font-style: italic;
+.buttons button {
+  width: 60px;
+  height: 60px;
+  font-size: 18px;
+  margin: 5px;
 }
 
-.run-rate {
-  font-weight: bold;
+.extras-button {
+  background-color: #dc3545;
+  color: #fff;
 }
 
-.target-rectangle {
-  background: white;
-  border-radius: 5px;
-  padding: 5px 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 3D effect */
+.extras-button:hover {
+  background-color: #c82333;
 }
 
-.target {
-  font-weight: bold;
-  color: #333; /* Dark text for contrast */
+.wicket-button {
+  background-color: #ffc107;
+  color: #000;
 }
 
-/* Animations for Score Updates */
-@keyframes scoreUpdate {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+.wicket-button:hover {
+  background-color: #e0a800;
 }
 
-.current-score, .overs, .run-rate, .target {
-  transition: transform 0.3s ease;
+.undo-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.current-score.updated, .overs.updated, .run-rate.updated, .target.updated {
-  animation: scoreUpdate 0.5s;
+.undo-button:hover {
+  background-color: #0056b3;
+}
+
+.hidden {
+  display: none;
 }
