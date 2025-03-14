@@ -4,106 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cricket Scoring App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    .input-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    .input-row span {
-      font-weight: bold;
-    }
-    .input-row input {
-      width: 60%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-    .hidden {
-      display: none;
-    }
-    .score-display {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .score-display p {
-      margin: 5px 0;
-      font-size: 16px;
-    }
-    .highlight-yellow {
-      background-color: yellow;
-      padding: 5px;
-      border-radius: 4px;
-    }
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .buttons button {
-      width: 60px;
-      height: 60px;
-      font-size: 18px;
-      margin: 5px;
-    }
-    .extras-button {
-      background-color: #dc3545;
-      color: #fff;
-    }
-    .extras-button:hover {
-      background-color: #c82333;
-    }
-    .wicket-button {
-      background-color: #ffc107;
-      color: #000;
-    }
-    .wicket-button:hover {
-      background-color: #e0a800;
-    }
-    .undo-button {
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .undo-button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <!-- Screen 1: Create Match -->
@@ -142,6 +43,7 @@
         <h2 id="team1Display" class="highlight-yellow"></h2>
         <h3>Runs</h3>
         <div class="buttons">
+          <button onclick="addScore(0, 1)" class="runs-button">0</button>
           <button onclick="addScore(1, 1)" class="runs-button">1</button>
           <button onclick="addScore(2, 1)" class="runs-button">2</button>
           <button onclick="addScore(3, 1)" class="runs-button">3</button>
@@ -167,6 +69,7 @@
         <h2 id="team2Display" class="highlight-yellow"></h2>
         <h3>Runs</h3>
         <div class="buttons">
+          <button onclick="addScore(0, 2)" class="runs-button">0</button>
           <button onclick="addScore(1, 2)" class="runs-button">1</button>
           <button onclick="addScore(2, 2)" class="runs-button">2</button>
           <button onclick="addScore(3, 2)" class="runs-button">3</button>
@@ -190,115 +93,23 @@
     </div>
   </div>
 
-  <script>
-    // Team data
-    let team1 = { name: '', score: 0, wickets: 0, overs: 0 };
-    let team2 = { name: '', score: 0, wickets: 0, overs: 0 };
-    let matchOvers = 0;
-    let history = { team1: [], team2: [] }; // To store last 6 inputs for undo
+  <!-- Pop-up for End of 1st Innings -->
+  <div id="endOfFirstInningsPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>End of 1st Innings</h2>
+      <button onclick="startSecondInnings()">Start 2nd Innings</button>
+      <button onclick="continueFirstInnings()">Continue 1st Innings</button>
+    </div>
+  </div>
 
-    // Google Apps Script URL
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbz4UhypsruR_B-RkP83_NIMjlbw9RzSD9w-z7Io_CYFiE3wgdNtaZDimH6My_i-LYDSQA/exec';
+  <!-- Pop-up for End of Match -->
+  <div id="endOfMatchPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>End of Match</h2>
+      <button onclick="continueScoring()">Continue Scoring</button>
+    </div>
+  </div>
 
-    // Screen elements
-    const teamNamesScreen = document.getElementById('teamNamesScreen');
-    const scoringScreen = document.getElementById('scoringScreen');
-    const team1Display = document.getElementById('team1Display');
-    const team2Display = document.getElementById('team2Display');
-    const team1ScoreDisplay = document.getElementById('team1ScoreDisplay');
-    const team2ScoreDisplay = document.getElementById('team2ScoreDisplay');
-    const matchOversDisplay = document.getElementById('matchOversDisplay');
-
-    // Handle team names form submission
-    document.getElementById('teamNamesForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      team1.name = document.getElementById('team1Name').value;
-      team2.name = document.getElementById('team2Name').value;
-      matchOvers = document.getElementById('matchOvers').value;
-      team1Display.textContent = team1.name;
-      team2Display.textContent = team2.name;
-      matchOversDisplay.textContent = `(${matchOvers} Overs Match)`;
-      teamNamesScreen.classList.add('hidden');
-      scoringScreen.classList.remove('hidden');
-      updateScoreDisplay();
-    });
-
-    // Add runs to the score and overs
-    function addScore(runs, team) {
-      const currentTeam = team === 1 ? team1 : team2;
-      currentTeam.score += runs;
-      currentTeam.overs += 0.1;
-      if (currentTeam.overs % 1 > 0.5) currentTeam.overs = Math.round(currentTeam.overs); // Round overs
-      updateHistory(currentTeam, { score: runs, overs: 0.1, wickets: 0 });
-      updateScoreDisplay();
-      sendDataToSheet();
-    }
-
-    // Add extras to the score (no overs)
-    function addExtra(runs, team) {
-      const currentTeam = team === 1 ? team1 : team2;
-      currentTeam.score += runs;
-      updateHistory(currentTeam, { score: runs, overs: 0, wickets: 0 });
-      updateScoreDisplay();
-      sendDataToSheet();
-    }
-
-    // Add wicket
-    function addWicket(team) {
-      const currentTeam = team === 1 ? team1 : team2;
-      currentTeam.wickets += 1;
-      updateHistory(currentTeam, { score: 0, overs: 0, wickets: 1 });
-      updateScoreDisplay();
-      sendDataToSheet();
-    }
-
-    // Undo last input
-    function undoLast(team) {
-      const currentTeam = team === 1 ? team1 : team2;
-      const lastAction = history[`team${team}`].pop();
-      if (lastAction) {
-        currentTeam.score -= lastAction.score;
-        currentTeam.overs -= lastAction.overs;
-        currentTeam.wickets -= lastAction.wickets;
-        updateScoreDisplay();
-        sendDataToSheet();
-      }
-    }
-
-    // Update history
-    function updateHistory(team, action) {
-      const teamKey = team === team1 ? 'team1' : 'team2';
-      history[teamKey].push(action);
-      if (history[teamKey].length > 6) history[teamKey].shift(); // Keep only last 6 inputs
-    }
-
-    // Update the score display
-    function updateScoreDisplay() {
-      team1ScoreDisplay.textContent = `${team1.name} ${team1.score}/${team1.wickets} (${team1.overs.toFixed(1)})`;
-      team2ScoreDisplay.textContent = `${team2.name} ${team2.score}/${team2.wickets} (${team2.overs.toFixed(1)})`;
-    }
-
-    // Send data to Google Sheet
-    function sendDataToSheet() {
-      const queryParams = `team1Name=${encodeURIComponent(team1.name)}&team1Score=${encodeURIComponent(team1.score)}&team1Wickets=${encodeURIComponent(team1.wickets)}&team1Overs=${encodeURIComponent(team1.overs)}&team2Name=${encodeURIComponent(team2.name)}&team2Score=${encodeURIComponent(team2.score)}&team2Wickets=${encodeURIComponent(team2.wickets)}&team2Overs=${encodeURIComponent(team2.overs)}`;
-
-      fetch(`${scriptUrl}?${queryParams}`, {
-        method: 'GET',
-      })
-        .then(response => response.json())
-        .then(result => {
-          console.log('Response:', result);
-          if (result.success) {
-            alert('Score updated successfully!');
-          } else {
-            alert('Failed to update score. Error: ' + (result.error || 'Unknown error'));
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Failed to update score. Check console for details.');
-        });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
