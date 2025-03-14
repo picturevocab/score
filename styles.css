@@ -1,9 +1,10 @@
-/* styles.css */
+/* Disable pull-to-refresh */
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
   margin: 0;
   padding: 20px;
+  overscroll-behavior-y: contain; /* Prevent pull-to-refresh */
 }
 
 .container {
@@ -124,4 +125,61 @@ button[type="submit"]:hover {
 
 .hidden {
   display: none;
+}
+
+/* Pop-up styles */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure pop-up is on top */
+}
+
+.popup.hidden {
+  display: none; /* Hide the pop-up when not needed */
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 300px; /* Limit the width of the pop-up */
+}
+
+.popup-content h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.popup-content button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: #28a745;
+  color: #fff;
+  width: 100%; /* Make buttons full width */
+}
+
+.popup-content button:hover {
+  background-color: #218838;
+}
+
+.popup-content button:last-child {
+  background-color: #007bff;
+}
+
+.popup-content button:last-child:hover {
+  background-color: #0056b3;
 }
