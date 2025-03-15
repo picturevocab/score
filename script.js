@@ -7,6 +7,7 @@ let team1 = {
   score: 0,
   wickets: 0,
   overs: 0,
+  history: [], // Store last 6 inputs for undo functionality
 };
 
 let team2 = {
@@ -14,6 +15,7 @@ let team2 = {
   score: 0,
   wickets: 0,
   overs: 0,
+  history: [], // Store last 6 inputs for undo functionality
 };
 
 let matchOvers = 0;
@@ -51,6 +53,10 @@ document.getElementById('teamNamesForm').addEventListener('submit', function (ev
   document.getElementById('team2Display').textContent = team2.name;
   document.getElementById('matchOversDisplay').textContent = `(${matchOvers} Overs Match)`;
 
+  // Update the score display with team names
+  document.getElementById('team1ScoreDisplay').textContent = `${team1.name}: ${team1.score}/${team1.wickets} (${team1.overs})`;
+  document.getElementById('team2ScoreDisplay').textContent = `${team2.name}: ${team2.score}/${team2.wickets} (${team2.overs})`;
+
   // Switch to the scoring screen
   document.getElementById('teamNamesScreen').classList.add('hidden');
   document.getElementById('scoringScreen').classList.remove('hidden');
@@ -58,23 +64,31 @@ document.getElementById('teamNamesForm').addEventListener('submit', function (ev
 
 // Update team scores and overs
 function updateScore(team, runs, wickets) {
-  if (team === 1) {
-    team1.score += runs;
-    team1.wickets += wickets;
-    if (wickets === 0) team1.overs += 0.1; // Increase overs by 0.1 for runs
-  } else if (team === 2) {
-    team2.score += runs;
-    team2.wickets += wickets;
-    if (wickets === 0) team2.overs += 0.1; // Increase overs by 0.1 for runs
+  const currentTeam = team === 1 ? team1 : team2;
+
+  // Add the current state to history (for undo functionality)
+  currentTeam.history.push({
+    score: currentTeam.score,
+    wickets: currentTeam.wickets,
+    overs: currentTeam.overs,
+  });
+
+  // Keep only the last 6 inputs
+  if (currentTeam.history.length > 6) {
+    currentTeam.history.shift();
   }
 
+  // Update score, wickets, and overs
+  currentTeam.score += runs;
+  currentTeam.wickets += wickets;
+  if (wickets === 0) currentTeam.overs += 0.1; // Increase overs by 0.1 for runs
+
   // Round overs to the nearest 0.5
-  if (team === 1) team1.overs = Math.round(team1.overs * 2) / 2;
-  if (team === 2) team2.overs = Math.round(team2.overs * 2) / 2;
+  currentTeam.overs = Math.round(currentTeam.overs * 2) / 2;
 
   // Update the display
-  document.getElementById('team1ScoreDisplay').textContent = `Team 1: ${team1.score}/${team1.wickets} (${team1.overs})`;
-  document.getElementById('team2ScoreDisplay').textContent = `Team 2: ${team2.score}/${team2.wickets} (${team2.overs})`;
+  document.getElementById('team1ScoreDisplay').textContent = `${team1.name}: ${team1.score}/${team1.wickets} (${team1.overs})`;
+  document.getElementById('team2ScoreDisplay').textContent = `${team2.name}: ${team2.score}/${team2.wickets} (${team2.overs})`;
 
   // Send data to Google Sheet
   sendDataToSheet();
@@ -92,12 +106,37 @@ function addWicket(team) {
 
 // Add extras (does not increase overs)
 function addExtra(runs, team) {
-  if (team === 1) team1.score += runs;
-  else if (team === 2) team2.score += runs;
+  const currentTeam = team === 1 ? team1 : team2;
+  currentTeam.score += runs;
 
   // Update the display
-  document.getElementById('team1ScoreDisplay').textContent = `Team 1: ${team1.score}/${team1.wickets} (${team1.overs})`;
-  document.getElementById('team2ScoreDisplay').textContent = `Team 2: ${team2.score}/${team2.wickets} (${team2.overs})`;
+  document.getElementById('team1ScoreDisplay').textContent = `${team1.name}: ${team1.score}/${team1.wickets} (${team1.overs})`;
+  document.getElementById('team2ScoreDisplay').textContent = `${team2.name}: ${team2.score}/${team2.wickets} (${team2.overs})`;
+
+  // Send data to Google Sheet
+  sendDataToSheet();
+}
+
+// Undo last 6 inputs for a team
+function undoLast(team) {
+  const currentTeam = team === 1 ? team1 : team2;
+
+  if (currentTeam.history.length === 0) {
+    alert('No more actions to undo.');
+    return;
+  }
+
+  // Get the last saved state
+  const lastState = currentTeam.history.pop();
+
+  // Restore the state
+  currentTeam.score = lastState.score;
+  currentTeam.wickets = lastState.wickets;
+  currentTeam.overs = lastState.overs;
+
+  // Update the display
+  document.getElementById('team1ScoreDisplay').textContent = `${team1.name}: ${team1.score}/${team1.wickets} (${team1.overs})`;
+  document.getElementById('team2ScoreDisplay').textContent = `${team2.name}: ${team2.score}/${team2.wickets} (${team2.overs})`;
 
   // Send data to Google Sheet
   sendDataToSheet();
