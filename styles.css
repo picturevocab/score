@@ -1,172 +1,61 @@
-/* Disable pull-to-refresh */
 body {
   font-family: Arial, sans-serif;
+  text-align: center;
   background-color: #f4f4f4;
   margin: 0;
   padding: 20px;
-  overscroll-behavior-y: contain; /* Prevent pull-to-refresh */
 }
 
-/* Created by Amanullah Khan */
-.created-by {
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.container {
-  max-width: 400px;
-  margin: 0 auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  text-align: center;
-  color: #333;
-}
-
-.input-row {
+.screen {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 15px;
 }
 
-.input-row span {
-  font-weight: bold;
-}
-
-.input-row input {
-  width: 60%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button[type="submit"] {
-  width: 100%;
+input {
+  margin: 10px;
   padding: 10px;
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  width: 200px;
 }
 
-button[type="submit"]:hover {
-  background-color: #218838;
-}
-
-.score-display {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.score-display p {
-  margin: 5px 0;
-  font-size: 16px;
-}
-
-.highlight-yellow {
-  background-color: yellow;
-  padding: 5px;
-  border-radius: 4px;
-}
-
-.buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.buttons button {
-  width: 60px;
-  height: 60px;
-  font-size: 18px;
+button {
   margin: 5px;
-}
-
-.runs-button {
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
   background-color: #007bff;
-  color: #fff;
+  color: white;
 }
 
-.runs-button:hover {
-  background-color: #0056b3;
+.button-group button {
+  background-color: #007bff;
 }
 
-.extras-button {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.extras-button:hover {
-  background-color: #c82333;
-}
-
-.wicket-button {
-  background-color: #ffc107;
-  color: #000;
-}
-
-.wicket-button:hover {
-  background-color: #e0a800;
+.extras-buttons button {
+  background-color: #dc3545; /* Red color for extras buttons */
 }
 
 .undo-button {
+  background-color: #dc3545;
   width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.undo-button:hover {
-  background-color: #0056b3;
-}
-
-.hidden {
-  display: none;
-}
-
-/* Score Ticker Overlay Link */
-.score-ticker-link {
-  text-align: center;
   margin-top: 20px;
 }
 
-.score-ticker-link h3 {
-  margin-bottom: 10px;
-  color: #333;
+.team-score {
+  background-color: #d4edda;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  width: 100%;
 }
 
-.score-ticker-link a {
-  display: block;
-  margin-bottom: 10px;
-  color: #007bff;
-  text-decoration: none;
+.divider {
+  border: 2px solid red;
+  width: 100%;
 }
 
-.score-ticker-link a:hover {
-  text-decoration: underline;
-}
-
-.score-ticker-link button {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.score-ticker-link button:hover {
-  background-color: #218838;
+.thick-red-line {
+  border: 3px solid red; /* Thicker red line */
+  margin: 20px 0; /* Add some spacing */
 }
