@@ -3,7 +3,7 @@ let team2 = { name: "", runs: 0, wickets: 0, overs: 0 };
 let matchOvers = 0;
 let currentInnings = 1;
 let history = [];
-const googleScriptUrl = "https://script.google.com/macros/s/AKfycbzc1g5bAzNYnxqmPUVSDCTcZkRxXRK7eek15Ivi7QMBLpTBb99Cf7doEfv0fxsG7WMTvA/exec"; // Your Google Apps Script URL
+const googleScriptUrl = "https://script.google.com/macros/s/AKfycbz1s9pT_efBd5zCDayekfMktdvD7CMznCJfSFkfA-2sLxXPMS6O_cQ2bP3HZzRvf6ZhXQ/exec"; // Your Google Apps Script URL
 
 function startScoring() {
   team1.name = document.getElementById("team1").value;
@@ -84,17 +84,13 @@ function checkInningsEnd() {
 function updateGoogleSheet() {
   const params = new URLSearchParams({
     team1Name: team1.name,
-    team1Score: team1.runs,
-    team1Wickets: team1.wickets,
-    team1Overs: team1.overs.toFixed(1),
     team2Name: team2.name,
-    team2Score: team2.runs,
-    team2Wickets: team2.wickets,
-    team2Overs: team2.overs.toFixed(1),
-    matchOvers: matchOvers
+    matchOvers: matchOvers,
+    cors: "true" // Add this parameter to handle CORS
   });
 
   const url = `${googleScriptUrl}?${params.toString()}`;
+  console.log("Sending request to:", url); // Log the URL
 
   fetch(url, {
     method: "GET",
